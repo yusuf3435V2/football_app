@@ -1,0 +1,405 @@
+// Initialize socket connection
+const socket = io();
+
+// Game state management
+const state = {
+    gameState: 'menu',
+    roomCode: '',
+    playerName: '',
+    players: [],
+    currentQuestion: null,
+    questionNumber: 0,
+    totalQuestions: 10,
+    timeLeft: 5,
+    answered: false,
+    scores: {},
+    finalScores: {},
+    winner: null,
+    isPlayerReady: false
+};
+
+// Socket event listeners
+socket.on('error', (data) => {
+    alert(`Error: ${data.message}`);
+});
+
+socket.on('room_created', (data) => {
+    state.roomCode = data.room_code;
+    state.players = data.players;
+    state.gameState = 'waiting';
+    state.isPlayerReady = false;
+    render();
+});
+
+socket.on('room_joined', (data) => {
+    state.roomCode = data.room_code;
+    state.players = data.players;
+    state.gameState = 'waiting';
+    state.isPlayerReady = false;
+    render();
+});
+
+socket.on('player_joined', (data) => {
+    state.players = data.players;
+    render();
+});
+
+socket.on('ready_status_updated', (data) => {
+    state.players = data.players;
+    render();
+});
+
+socket.on('both_players_ready', () => {
+    state.gameState = 'starting';
+    render();
+});
+
+socket.on('player_left', (data) => {
+    state.players = data.players || [];
+
+    if (state.gameState !== 'menu') {
+        alert('The other player left the room.');
+        state.gameState = 'waiting';
+        state.isPlayerReady = false;
+        render();
+    }
+});
+
+socket.on('game_started', (data) => {
+    state.currentQuestion = data.question;
+    state.questionNumber = data.question_number;
+    state.totalQuestions = data.total_questions;
+    state.scores = data.scores || {};
+    state.gameState = 'quiz';
+    state.timeLeft = 5;
+    state.answered = false;
+    startTimer();
+    render();
+});
+
+socket.on('question_answered', (data) => {
+    state.currentQuestion = data.question;
+    state.questionNumber = data.question_number;
+    state.totalQuestions = data.total_questions;
+    state.scores = data.scores;
+    state.timeLeft = 5;
+    state.answered = false;
+    startTimer();
+    render();
+});
+
+socket.on('game_ended', (data) => {
+    if (timerInterval) clearInterval(timerInterval);
+
+    state.gameState = 'results';
+    state.finalScores = data.final_scores;
+    state.winner = data.winner;
+    render();
+});
+
+socket.on('room_updated', (data) => {
+    state.roomCode = data.room_code;
+    state.players = data.players;
+    state.gameState = 'waiting';
+
+    const currentPlayer = state.players.find(player => player.name === state.playerName);
+
+    if (currentPlayer) {
+        state.isPlayerReady = currentPlayer.is_ready;
+    }
+
+    render();
+});
+
+// Timer management
+let timerInterval = null;
+
+function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+
+    state.timeLeft = 5;
+
+    timerInterval = setInterval(() => {
+        state.timeLeft -= 1;
+        render();
+
+        if (state.timeLeft <= 0) {
+            clearInterval(timerInterval);
+        }
+    }, 1000);
+}
+
+// Event handlers
+function handleCreateRoom(e) {
+    e.preventDefault();
+
+    const roomCode = document.getElementById('roomCode').value.trim();
+    const playerName = document.getElementById('playerName').value.trim();
+
+    if (roomCode && playerName) {
+        state.roomCode = roomCode.toUpperCase();
+        state.playerName = playerName;
+        socket.emit('create_room', {
+            room_code: roomCode,
+            player_name: playerName
+        });
+    }
+}
+
+function handleJoinRoom(e) {
+    e.preventDefault();
+
+    const roomCode = document.getElementById('joinRoomCode').value.trim();
+    const playerName = document.getElementById('joinPlayerName').value.trim();
+
+    if (roomCode && playerName) {
+        state.roomCode = roomCode.toUpperCase();
+        state.playerName = playerName;
+        socket.emit('join_room', {
+            room_code: roomCode,
+            player_name: playerName
+        });
+    }
+}
+
+function handleReadyClick() {
+    if (!state.isPlayerReady) {
+        state.isPlayerReady = true;
+        socket.emit('player_ready', {});
+        render();
+    }
+}
+
+function handleAnswerClick(index) {
+    if (!state.answered) {
+        state.answered = true;
+        socket.emit('submit_answer', {
+            answer_index: index
+        });
+        render();
+    }
+}
+
+function handlePlayAgain() {
+    if (timerInterval) clearInterval(timerInterval);
+
+    state.gameState = 'menu';
+    state.roomCode = '';
+    state.playerName = '';
+    state.players = [];
+    state.currentQuestion = null;
+    state.questionNumber = 0;
+    state.timeLeft = 5;
+    state.answered = false;
+    state.scores = {};
+    state.finalScores = {};
+    state.winner = null;
+    state.isPlayerReady = false;
+
+    render();
+}
+
+// Rendering functions
+function render() {
+    const root = document.getElementById('root');
+
+    if (state.gameState === 'menu') {
+        root.innerHTML = renderMenu();
+    } else if (state.gameState === 'waiting') {
+        root.innerHTML = renderWaiting();
+    } else if (state.gameState === 'starting') {
+        root.innerHTML = renderStarting();
+    } else if (state.gameState === 'quiz') {
+        root.innerHTML = renderQuiz();
+    } else if (state.gameState === 'results') {
+        root.innerHTML = renderResults();
+    }
+}
+
+function renderMenu() {
+    return `
+        <div class="app">
+            <div class="menu-container">
+                <h1>Multiplayer Football Quiz</h1>
+
+                <div class="menu-options">
+                    <div class="menu-section">
+                        <h2>Create Room</h2>
+                        <form onsubmit="handleCreateRoom(event)">
+                            <input type="text" id="roomCode" placeholder="Enter room code" maxlength="20" required />
+                            <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" required />
+                            <button type="submit" class="btn btn-primary">Create Room</button>
+                        </form>
+                    </div>
+
+                    <div class="divider">OR</div>
+
+                    <div class="menu-section">
+                        <h2>Join Room</h2>
+                        <form onsubmit="handleJoinRoom(event)">
+                            <input type="text" id="joinRoomCode" placeholder="Enter room code" maxlength="20" required />
+                            <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20" required />
+                            <button type="submit" class="btn btn-primary">Join Room</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderWaiting() {
+    const bothPlayersJoined = state.players.length === 2;
+
+    return `
+        <div class="app">
+            <div class="waiting-container">
+                <h1>Room: ${state.roomCode}</h1>
+
+                <p class="info">
+                    ${bothPlayersJoined
+                        ? 'Both players have joined. Ready up to start the quiz.'
+                        : 'Waiting for another player to join...'}
+                </p>
+
+                <div class="players-list">
+                    ${state.players.map(player => `
+                        <div class="player-item">
+                            <span class="player-name">${player.name}</span>
+                            <span class="player-status ${player.is_ready ? 'ready' : 'not-ready'}">
+                                ${player.is_ready ? '✓ Ready' : '○ Not Ready'}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <p class="players-count">${state.players.length} / 2 players</p>
+
+                ${bothPlayersJoined ? `
+                    <button
+                        class="btn btn-primary ${state.isPlayerReady ? 'ready-btn-active' : ''}"
+                        onclick="handleReadyClick()"
+                        ${state.isPlayerReady ? 'disabled' : ''}
+                    >
+                        ${state.isPlayerReady ? '✓ You are ready' : 'Ready Up'}
+                    </button>
+                ` : `
+                    <div class="spinner"></div>
+                    <p class="info">Share this room code with your opponent: <strong>${state.roomCode}</strong></p>
+                `}
+            </div>
+        </div>
+    `;
+}
+
+function renderStarting() {
+    return `
+        <div class="app">
+            <div class="starting-container">
+                <h1>Room: ${state.roomCode}</h1>
+
+                <div class="starting-players">
+                    ${state.players.map(player => `
+                        <div class="starting-player">${player.name}</div>
+                    `).join('')}
+                </div>
+
+                <p class="starting-text">Both players ready. Game starting...</p>
+                <div class="countdown">🎮</div>
+            </div>
+        </div>
+    `;
+}
+
+function renderQuiz() {
+    if (!state.currentQuestion) {
+        return `
+            <div class="app">
+                <div class="quiz-container">
+                    <h2>Loading question...</h2>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="app">
+            <div class="quiz-container">
+                <div class="quiz-header">
+                    <div class="question-counter">
+                        Question ${state.questionNumber} of ${state.totalQuestions}
+                    </div>
+
+                    <div class="timer">
+                        <span class="time ${state.timeLeft <= 2 ? 'warning' : ''}">
+                            ${state.timeLeft}s
+                        </span>
+                    </div>
+                </div>
+
+                <div class="quiz-content">
+                    <h2 class="question-text">${state.currentQuestion.question}</h2>
+
+                    <div class="options-grid">
+                        ${state.currentQuestion.options.map((option, index) => `
+                            <button
+                                class="option-btn ${state.answered ? 'disabled' : ''}"
+                                onclick="handleAnswerClick(${index})"
+                                ${state.answered ? 'disabled' : ''}
+                            >
+                                <span class="option-label">${String.fromCharCode(65 + index)}</span>
+                                <span class="option-text">${option}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="scores-display">
+                    ${Object.entries(state.scores).map(([id, data]) => `
+                        <div class="score-item">
+                            <span class="player-name">${data.name}</span>
+                            <span class="score-value">${data.score}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                ${state.answered ? `
+                    <div class="answer-submitted">Answer submitted!</div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function renderResults() {
+    return `
+        <div class="app">
+            <div class="results-container">
+                <h1>Game Over!</h1>
+
+                <div class="winner-section">
+                    <h2 class="winner-text">🎉 ${state.winner.name} Wins! 🎉</h2>
+                    <p class="winner-score">Score: ${state.winner.score} / 10</p>
+                </div>
+
+                <div class="final-scores">
+                    <h3>Final Scores</h3>
+
+                    <div class="scores-list">
+                        ${Object.entries(state.finalScores).map(([name, score]) => `
+                            <div class="score-row ${name === state.winner.name ? 'winner-row' : ''}">
+                                <span class="name">${name}</span>
+                                <span class="points">${score} / 10</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="handlePlayAgain()">Back to Menu</button>
+            </div>
+        </div>
+    `;
+}
+
+// Initial render
+render();
