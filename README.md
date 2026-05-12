@@ -4,15 +4,14 @@ A real-time 2-player multiplayer quiz game built with Python/Flask and Socket.io
 
 ## Features
 
-- ✅ Real-time multiplayer using Socket.io
-- ✅ Room creation and join system with custom room codes
-- ✅ 10 quiz questions with 4 multiple-choice options
-- ✅ 5-second timer per question
-- ✅ Live score tracking
-- ✅ Winner determination based on correct answers
-- ✅ **Backend-side answer validation** (no cheating via browser inspection)
-- ✅ Responsive UI with modern design
-- ✅ Functional Python backend with one-line docstrings
+- Real-time multiplayer using Socket.io
+- Room creation and join system with custom room codes
+- 10 quiz questions with 4 multiple-choice options
+- 5-second timer per question
+- Live score tracking
+- Winner determination based on correct answers
+- Responsive UI with modern design
+- Functional Python backend with one-line docstrings
 
 ## Installation
 
