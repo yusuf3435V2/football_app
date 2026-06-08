@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, join_room
+import random
 import threading
 import time
 
@@ -13,6 +14,8 @@ socketio = SocketIO(
 rooms = {}
 
 # Answers stay on the backend only. The frontend only receives id/question/options.
+GAME_QUESTION_COUNT = 10
+
 QUESTIONS = [
     {'id': 1, 'question': 'Which player has won the most Ballon d\'Or awards?', 'options': ['Cristiano Ronaldo', 'Lionel Messi', 'Zinedine Zidane', 'Ronaldo Nazario'], 'correct': 1},
     {'id': 2, 'question': 'Which country won the 2022 FIFA World Cup?', 'options': ['France', 'Brazil', 'Argentina', 'Germany'], 'correct': 2},
@@ -24,7 +27,48 @@ QUESTIONS = [
     {'id': 8, 'question': 'Who is Arsenal\'s all-time top goalscorer?', 'options': ['Dennis Bergkamp', 'Thierry Henry', 'Ian Wright', 'Robin van Persie'], 'correct': 1},
     {'id': 9, 'question': 'Which club did Mohamed Salah join Liverpool from?', 'options': ['Roma', 'Chelsea', 'Basel', 'Fiorentina'], 'correct': 0},
     {'id': 10, 'question': 'Which nation won Euro 2016?', 'options': ['France', 'Portugal', 'Spain', 'Italy'], 'correct': 1},
+    {'id': 11, 'question': 'Who scored the winning goal for Spain in the 2010 FIFA World Cup final?', 'options': ['Xavi', 'Andres Iniesta', 'David Villa', 'Fernando Torres'], 'correct': 1},
+    {'id': 12, 'question': 'Which club won the first Premier League title in 1992/93?', 'options': ['Manchester United', 'Blackburn Rovers', 'Arsenal', 'Leeds United'], 'correct': 0},
+    {'id': 13, 'question': 'Which goalkeeper has the most Premier League clean sheets?', 'options': ['David Seaman', 'Petr Cech', 'Edwin van der Sar', 'Peter Schmeichel'], 'correct': 1},
+    {'id': 14, 'question': 'Which manager led Porto to the 2003/04 UEFA Champions League title?', 'options': ['Jose Mourinho', 'Andre Villas-Boas', 'Bobby Robson', 'Luigi Delneri'], 'correct': 0},
+    {'id': 15, 'question': 'Which player scored Liverpool\'s opening goal in the 2005 Champions League final comeback?', 'options': ['Steven Gerrard', 'Xabi Alonso', 'Vladimir Smicer', 'Luis Garcia'], 'correct': 0},
+    {'id': 16, 'question': 'Which club did Robert Lewandowski play for before joining Bayern Munich?', 'options': ['Lech Poznan', 'Borussia Dortmund', 'Legia Warsaw', 'Wolfsburg'], 'correct': 1},
+    {'id': 17, 'question': 'Which country knocked Brazil out of the 2006 FIFA World Cup?', 'options': ['Italy', 'France', 'Germany', 'Netherlands'], 'correct': 1},
+    {'id': 18, 'question': 'Who won the Golden Boot at the 2018 FIFA World Cup?', 'options': ['Kylian Mbappe', 'Romelu Lukaku', 'Harry Kane', 'Antoine Griezmann'], 'correct': 2},
+    {'id': 19, 'question': 'Which club is nicknamed The Old Lady?', 'options': ['Juventus', 'AC Milan', 'Inter Milan', 'Roma'], 'correct': 0},
+    {'id': 20, 'question': 'Who scored the Hand of God goal in the 1986 FIFA World Cup?', 'options': ['Pele', 'Diego Maradona', 'Michel Platini', 'Johan Cruyff'], 'correct': 1},
+    {'id': 21, 'question': 'Which team won the UEFA Champions League in 2011/12?', 'options': ['Bayern Munich', 'Chelsea', 'Barcelona', 'Real Madrid'], 'correct': 1},
+    {'id': 22, 'question': 'Which nation won the first FIFA World Cup in 1930?', 'options': ['Brazil', 'Argentina', 'Uruguay', 'Italy'], 'correct': 2},
+    {'id': 23, 'question': 'Which player is known as Il Fenomeno?', 'options': ['Ronaldinho', 'Ronaldo Nazario', 'Romario', 'Kaka'], 'correct': 1},
+    {'id': 24, 'question': 'Which club won the treble under Pep Guardiola in 2008/09?', 'options': ['Barcelona', 'Bayern Munich', 'Manchester City', 'Inter Milan'], 'correct': 0},
+    {'id': 25, 'question': 'Who scored the decisive penalty for Italy in the 2006 World Cup final shootout?', 'options': ['Andrea Pirlo', 'Fabio Grosso', 'Francesco Totti', 'Alessandro Del Piero'], 'correct': 1},
+    {'id': 26, 'question': 'Which club did Luka Modric join Real Madrid from?', 'options': ['Dinamo Zagreb', 'Inter Milan', 'Tottenham Hotspur', 'Sevilla'], 'correct': 2},
+    {'id': 27, 'question': 'Which African nation reached the 2022 FIFA World Cup semi-finals?', 'options': ['Senegal', 'Morocco', 'Ghana', 'Cameroon'], 'correct': 1},
+    {'id': 28, 'question': 'Who managed Arsenal during their Invincibles Premier League season?', 'options': ['George Graham', 'Arsene Wenger', 'Unai Emery', 'Bruce Rioch'], 'correct': 1},
+    {'id': 29, 'question': 'Which player scored a hat-trick for Manchester United against Bayern Munich in the 1998/99 Champions League final?', 'options': ['Dwight Yorke', 'Andy Cole', 'Teddy Sheringham', 'No player scored a hat-trick'], 'correct': 3},
+    {'id': 30, 'question': 'Which team did Greece beat in the Euro 2004 final?', 'options': ['Portugal', 'Czech Republic', 'France', 'Netherlands'], 'correct': 0},
+    {'id': 31, 'question': 'Which club did Karim Benzema join after leaving Real Madrid in 2023?', 'options': ['Al Hilal', 'Al Nassr', 'Al Ittihad', 'Al Ahli'], 'correct': 2},
+    {'id': 32, 'question': 'Who scored the fastest goal in Premier League history?', 'options': ['Ledley King', 'Shane Long', 'Alan Shearer', 'Sadio Mane'], 'correct': 1},
+    {'id': 33, 'question': 'Which country hosted the 1998 FIFA World Cup?', 'options': ['Germany', 'France', 'USA', 'South Korea and Japan'], 'correct': 1},
+    {'id': 34, 'question': 'Which player won the Ballon d\'Or in 2007?', 'options': ['Cristiano Ronaldo', 'Kaka', 'Lionel Messi', 'Ronaldinho'], 'correct': 1},
+    {'id': 35, 'question': 'Which English club did N\'Golo Kante join first?', 'options': ['Chelsea', 'Leicester City', 'Arsenal', 'West Ham United'], 'correct': 1},
+    {'id': 36, 'question': 'Which club won Serie A in 2022/23?', 'options': ['AC Milan', 'Inter Milan', 'Napoli', 'Juventus'], 'correct': 2},
+    {'id': 37, 'question': 'Which player scored the winning goal in the Euro 2016 final?', 'options': ['Cristiano Ronaldo', 'Eder', 'Nani', 'Ricardo Quaresma'], 'correct': 1},
+    {'id': 38, 'question': 'Which stadium hosted the 2012 Olympic football final?', 'options': ['Wembley Stadium', 'Old Trafford', 'Millennium Stadium', 'Emirates Stadium'], 'correct': 0},
+    {'id': 39, 'question': 'Which club did Luis Suarez join immediately after leaving Liverpool?', 'options': ['Atletico Madrid', 'Barcelona', 'Ajax', 'Inter Miami'], 'correct': 1},
+    {'id': 40, 'question': 'Which nation did England beat in the Euro 2020 semi-final?', 'options': ['Germany', 'Ukraine', 'Denmark', 'Croatia'], 'correct': 2},
+    {'id': 41, 'question': 'Which club won the UEFA Champions League in 2018/19?', 'options': ['Liverpool', 'Tottenham Hotspur', 'Real Madrid', 'Ajax'], 'correct': 0},
+    {'id': 42, 'question': 'Who was Manchester City\'s manager when they won their first Premier League title?', 'options': ['Manuel Pellegrini', 'Roberto Mancini', 'Pep Guardiola', 'Mark Hughes'], 'correct': 1},
+    {'id': 43, 'question': 'Which country did Zinedine Zidane score twice against in the 1998 World Cup final?', 'options': ['Brazil', 'Italy', 'Croatia', 'Germany'], 'correct': 0},
+    {'id': 44, 'question': 'Which club did Eden Hazard join Real Madrid from?', 'options': ['Lille', 'Chelsea', 'Borussia Dortmund', 'Monaco'], 'correct': 1},
+    {'id': 45, 'question': 'Which team won the 2020/21 UEFA Champions League?', 'options': ['Manchester City', 'Chelsea', 'Bayern Munich', 'Paris Saint-Germain'], 'correct': 1},
+    {'id': 46, 'question': 'Who is the only goalkeeper to have won the Ballon d\'Or?', 'options': ['Lev Yashin', 'Gianluigi Buffon', 'Manuel Neuer', 'Iker Casillas'], 'correct': 0},
+    {'id': 47, 'question': 'Which club did Jude Bellingham join Real Madrid from?', 'options': ['Birmingham City', 'Borussia Dortmund', 'Bayern Munich', 'RB Leipzig'], 'correct': 1},
+    {'id': 48, 'question': 'Which nation won the 2019 Copa America?', 'options': ['Argentina', 'Brazil', 'Chile', 'Uruguay'], 'correct': 1},
+    {'id': 49, 'question': 'Who scored Real Madrid\'s goal in the 2021/22 Champions League final?', 'options': ['Karim Benzema', 'Vinicius Junior', 'Luka Modric', 'Rodrygo'], 'correct': 1},
+    {'id': 50, 'question': 'Which country won the 2010 Africa Cup of Nations?', 'options': ['Ghana', 'Ivory Coast', 'Egypt', 'Nigeria'], 'correct': 2},
 ]
+
 
 
 class GameRoom:
@@ -35,6 +79,7 @@ class GameRoom:
         self.room_code = room_code
         self.players = {}
         self.current_question_index = 0
+        self.selected_questions = []
         self.game_started = False
         self.game_ended = False
         self.question_timeout = None
@@ -72,6 +117,7 @@ class GameRoom:
     def reset_for_game_start(self):
         """Reset scores and answers when the quiz begins."""
         self.current_question_index = 0
+        self.selected_questions = random.sample(QUESTIONS, GAME_QUESTION_COUNT)
         self.game_started = True
         self.game_ended = False
         self.is_evaluating = False
@@ -89,7 +135,7 @@ class GameRoom:
 
     def get_question_data(self):
         """Return the current question without revealing the correct answer."""
-        question = QUESTIONS[self.current_question_index]
+        question = self.selected_questions[self.current_question_index]
         return {
             'id': question['id'],
             'question': question['question'],
@@ -109,7 +155,7 @@ class GameRoom:
 
     def evaluate_answers(self):
         """Mark answers and update scores."""
-        question = QUESTIONS[self.current_question_index]
+        question = self.selected_questions[self.current_question_index]
         for player in self.players.values():
             selected_answer = player['current_answer']
             is_correct = selected_answer == question['correct']
@@ -127,7 +173,7 @@ class GameRoom:
     def move_to_next_question(self):
         """Move to the next question and return whether one exists."""
         self.current_question_index += 1
-        return self.current_question_index < len(QUESTIONS)
+        return self.current_question_index < len(self.selected_questions)
 
     def get_scores(self):
         """Return current scores keyed by player id."""
@@ -304,7 +350,7 @@ def start_game(room_code):
     socketio.emit('game_started', {
         'question': room.get_question_data(),
         'question_number': 1,
-        'total_questions': len(QUESTIONS),
+        'total_questions': len(room.selected_questions),
         'scores': room.get_scores(),
     }, to=room_code)
 
@@ -366,7 +412,7 @@ def evaluate_and_next_question(room_code):
         socketio.emit('question_answered', {
             'question': room.get_question_data(),
             'question_number': room.current_question_index + 1,
-            'total_questions': len(QUESTIONS),
+            'total_questions': len(room.selected_questions),
             'scores': room.get_scores(),
         }, to=room_code)
         schedule_question_timeout(room_code)
