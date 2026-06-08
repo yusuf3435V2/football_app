@@ -206,6 +206,14 @@ body::before {
     font-size: 18px;
 }
 
+.player-name.player-1 {
+    color: #2563eb;
+}
+
+.player-name.player-2 {
+    color: #dc2626;
+}
+
 .player-status {
     font-weight: 700;
     padding: 8px 16px;

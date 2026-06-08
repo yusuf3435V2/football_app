@@ -263,9 +263,9 @@ function renderWaiting() {
                 </p>
 
                 <div class="players-list">
-                    ${state.players.map(player => `
+                    ${state.players.map((player, index) => `
                         <div class="player-item">
-                            <span class="player-name">👤 ${player.name}</span>
+                            <span class="player-name ${index === 0 ? 'player-1' : 'player-2'}">👤 ${player.name}</span>
                             <span class="player-status ${player.is_ready ? 'ready' : 'not-ready'}">
                                 ${player.is_ready ? '✅ READY' : '⏸ WAITING'}
                             </span>
