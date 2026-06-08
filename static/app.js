@@ -220,26 +220,26 @@ function renderMenu() {
     return `
         <div class="app">
             <div class="menu-container">
-                <h1>Multiplayer Football Quiz</h1>
+                <h1>⚽ FOOTBALL QUIZ ⚽</h1>
 
                 <div class="menu-options">
                     <div class="menu-section">
-                        <h2>Create Room</h2>
+                        <h2>🏟️ Create Room</h2>
                         <form onsubmit="handleCreateRoom(event)">
                             <input type="text" id="roomCode" placeholder="Enter room code" maxlength="20" required />
                             <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" required />
-                            <button type="submit" class="btn btn-primary">Create Room</button>
+                            <button type="submit" class="btn btn-primary">Create & Host</button>
                         </form>
                     </div>
 
                     <div class="divider">OR</div>
 
                     <div class="menu-section">
-                        <h2>Join Room</h2>
+                        <h2>👥 Join Room</h2>
                         <form onsubmit="handleJoinRoom(event)">
                             <input type="text" id="joinRoomCode" placeholder="Enter room code" maxlength="20" required />
                             <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20" required />
-                            <button type="submit" class="btn btn-primary">Join Room</button>
+                            <button type="submit" class="btn btn-primary">Join Match</button>
                         </form>
                     </div>
                 </div>
@@ -254,26 +254,26 @@ function renderWaiting() {
     return `
         <div class="app">
             <div class="waiting-container">
-                <h1>Room: ${state.roomCode}</h1>
+                <h1>🎯 MATCH ROOM: ${state.roomCode}</h1>
 
                 <p class="info">
                     ${bothPlayersJoined
-                        ? 'Both players have joined. Ready up to start the quiz.'
-                        : 'Waiting for another player to join...'}
+                        ? '⚽ Both teams ready! Click your status button to start the challenge.'
+                        : '⏳ Waiting for your opponent to join...'}
                 </p>
 
                 <div class="players-list">
                     ${state.players.map(player => `
                         <div class="player-item">
-                            <span class="player-name">${player.name}</span>
+                            <span class="player-name">👤 ${player.name}</span>
                             <span class="player-status ${player.is_ready ? 'ready' : 'not-ready'}">
-                                ${player.is_ready ? '✓ Ready' : '○ Not Ready'}
+                                ${player.is_ready ? '✅ READY' : '⏸ WAITING'}
                             </span>
                         </div>
                     `).join('')}
                 </div>
 
-                <p class="players-count">${state.players.length} / 2 players</p>
+                <p class="players-count">👥 ${state.players.length} / 2 Players</p>
 
                 ${bothPlayersJoined ? `
                     <button
@@ -281,11 +281,11 @@ function renderWaiting() {
                         onclick="handleReadyClick()"
                         ${state.isPlayerReady ? 'disabled' : ''}
                     >
-                        ${state.isPlayerReady ? '✓ You are ready' : 'Ready Up'}
+                        ${state.isPlayerReady ? '✅ YOU ARE READY!' : '🎮 Ready Up to Play'}
                     </button>
                 ` : `
                     <div class="spinner"></div>
-                    <p class="info">Share this room code with your opponent: <strong>${state.roomCode}</strong></p>
+                    <p class="info">📱 Share this code with your friend: <strong style="font-size: 18px; color: #ff6b35;">${state.roomCode}</strong></p>
                 `}
             </div>
         </div>
@@ -296,15 +296,15 @@ function renderStarting() {
     return `
         <div class="app">
             <div class="starting-container">
-                <h1>Room: ${state.roomCode}</h1>
+                <h1>⚽ KICKOFF! ⚽</h1>
 
                 <div class="starting-players">
                     ${state.players.map(player => `
-                        <div class="starting-player">${player.name}</div>
+                        <div class="starting-player">👤 ${player.name}</div>
                     `).join('')}
                 </div>
 
-                <p class="starting-text">Both players ready. Game starting...</p>
+                <p class="starting-text">🏁 Get Ready to Test Your Knowledge!</p>
                 <div class="countdown">🎮</div>
             </div>
         </div>
@@ -316,7 +316,7 @@ function renderQuiz() {
         return `
             <div class="app">
                 <div class="quiz-container">
-                    <h2>Loading question...</h2>
+                    <h2>Loading next question...</h2>
                 </div>
             </div>
         `;
@@ -327,12 +327,12 @@ function renderQuiz() {
             <div class="quiz-container">
                 <div class="quiz-header">
                     <div class="question-counter">
-                        Question ${state.questionNumber} of ${state.totalQuestions}
+                        ⚽ Question ${state.questionNumber}/${state.totalQuestions}
                     </div>
 
                     <div class="timer">
                         <span class="time ${state.timeLeft <= 2 ? 'warning' : ''}">
-                            ${state.timeLeft}s
+                            ⏱️ ${state.timeLeft}s
                         </span>
                     </div>
                 </div>
@@ -357,14 +357,14 @@ function renderQuiz() {
                 <div class="scores-display">
                     ${Object.entries(state.scores).map(([id, data]) => `
                         <div class="score-item">
-                            <span class="player-name">${data.name}</span>
+                            <span class="player-name">👤 ${data.name}</span>
                             <span class="score-value">${data.score}</span>
                         </div>
                     `).join('')}
                 </div>
 
                 ${state.answered ? `
-                    <div class="answer-submitted">Answer submitted!</div>
+                    <div class="answer-submitted">✅ Answer Submitted!</div>
                 ` : ''}
             </div>
         </div>
@@ -375,27 +375,28 @@ function renderResults() {
     return `
         <div class="app">
             <div class="results-container">
-                <h1>Game Over!</h1>
+                <h1>🏁 FULL TIME 🏁</h1>
 
                 <div class="winner-section">
-                    <h2 class="winner-text">🎉 ${state.winner.name} Wins! 🎉</h2>
-                    <p class="winner-score">Score: ${state.winner.score} / 10</p>
+                    <h2 class="winner-text">🏆 ${state.winner.name} WINS! 🏆</h2>
+                    <p class="winner-score">Final Score: ${state.winner.score} / 10 Questions</p>
                 </div>
 
                 <div class="final-scores">
-                    <h3>Final Scores</h3>
+                    <h3>📊 Final Standings</h3>
 
                     <div class="scores-list">
-                        ${Object.entries(state.finalScores).map(([name, score]) => `
+                        ${Object.entries(state.finalScores).map(([name, score], index) => `
                             <div class="score-row ${name === state.winner.name ? 'winner-row' : ''}">
+                                <span class="rank">${index === 0 ? '🥇' : '🥈'}</span>
                                 <span class="name">${name}</span>
-                                <span class="points">${score} / 10</span>
+                                <span class="points">${score} ⭐</span>
                             </div>
                         `).join('')}
                     </div>
                 </div>
 
-                <button class="btn btn-primary" onclick="handlePlayAgain()">Back to Menu</button>
+                <button class="btn btn-primary" onclick="handlePlayAgain()">⬅️ Back to Menu</button>
             </div>
         </div>
     `;

@@ -7,8 +7,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'quiz-secret-key-2026'
 socketio = SocketIO(
     app,
-    cors_allowed_origins="*",
-    async_mode='eventlet'
+    cors_allowed_origins="*"
 )
 
 rooms = {}
