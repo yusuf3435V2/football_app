@@ -337,24 +337,29 @@ body::before {
 }
 
 .timer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
-    height: 70px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-    font-size: 32px;
-    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
     color: white;
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+    font-weight: bold;
 }
 
 .timer .time {
-    color: white;
-    transition: color 0.3s;
+    font-size: 38px;
+    line-height: 1;
 }
 
+.timer::before {
+    content: '⏱️';
+    font-size: 26px;
+    line-height: 1;
+}
 .timer .time.warning {
     animation: pulse 1s infinite;
 }

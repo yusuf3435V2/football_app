@@ -332,7 +332,7 @@ function renderQuiz() {
 
                     <div class="timer">
                         <span class="time ${state.timeLeft <= 2 ? 'warning' : ''}">
-                            ⏱️ ${state.timeLeft}s
+                            ${state.timeLeft}s
                         </span>
                     </div>
                 </div>
