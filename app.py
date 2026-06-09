@@ -67,6 +67,442 @@ QUESTIONS = [
     {'id': 48, 'question': 'Which nation won the 2019 Copa America?', 'options': ['Argentina', 'Brazil', 'Chile', 'Uruguay'], 'correct': 1},
     {'id': 49, 'question': 'Who scored Real Madrid\'s goal in the 2021/22 Champions League final?', 'options': ['Karim Benzema', 'Vinicius Junior', 'Luka Modric', 'Rodrygo'], 'correct': 1},
     {'id': 50, 'question': 'Which country won the 2010 Africa Cup of Nations?', 'options': ['Ghana', 'Ivory Coast', 'Egypt', 'Nigeria'], 'correct': 2},
+    {'id': 51, 'question': 'Which player scored the fastest hat-trick in Premier League history?',
+        'options': ['Sergio Aguero', 'Sadio Mane', 'Robbie Fowler', 'Michael Owen'], 'correct': 1},
+
+    {'id': 52, 'question': 'Which player has made the most Premier League appearances?',
+        'options': ['Ryan Giggs', 'Gareth Barry', 'James Milner', 'Frank Lampard'], 'correct': 1},
+
+    {'id': 53, 'question': 'Which of these players shares the record for the most Premier League red cards?',
+        'options': ['Roy Keane', 'Patrick Vieira', 'John Terry', 'Nemanja Vidic'], 'correct': 1},
+
+    {'id': 54, 'question': 'With 260 goals, who is the Premier League\'s all-time top scorer?',
+        'options': ['Wayne Rooney', 'Harry Kane', 'Alan Shearer', 'Sergio Aguero'], 'correct': 2},
+
+    {'id': 55, 'question': 'How many clubs competed in the inaugural Premier League season?',
+        'options': ['18', '20', '22', '24'], 'correct': 2},
+
+    {'id': 56, 'question': 'Which player won the Premier League Golden Boot alongside Mohamed Salah and Sadio Mane in 2018/19?',
+        'options': ['Jamie Vardy', 'Pierre-Emerick Aubameyang', 'Raheem Sterling', 'Harry Kane'], 'correct': 1},
+
+    {'id': 57, 'question': 'Who was the first player to score 100 Premier League goals?',
+        'options': ['Alan Shearer', 'Thierry Henry', 'Les Ferdinand', 'Michael Owen'], 'correct': 0},
+
+    {'id': 58, 'question': 'Which club went an entire Premier League season unbeaten?',
+        'options': ['Manchester United', 'Chelsea', 'Liverpool', 'Arsenal'], 'correct': 3},
+
+    {'id': 59, 'question': 'Who scored the winning goal in the 1999 UEFA Champions League final for Manchester United?',
+        'options': ['Ole Gunnar Solskjaer', 'Teddy Sheringham', 'Dwight Yorke', 'Andy Cole'], 'correct': 0},
+
+    {'id': 60, 'question': 'Which country did Cristiano Ronaldo make his international debut against?',
+        'options': ['England', 'Kazakhstan', 'Portugal', 'Germany'], 'correct': 1},
+
+    {'id': 61, 'question': 'Which club did Kevin De Bruyne join Manchester City from?',
+        'options': ['Chelsea', 'Genk', 'Werder Bremen', 'Wolfsburg'], 'correct': 3},
+
+    {'id': 62, 'question': 'Who won the FIFA World Cup Golden Ball in 2014?', 'options': [
+        'Thomas Muller', 'James Rodriguez', 'Lionel Messi', 'Arjen Robben'], 'correct': 2},
+
+    {'id': 63, 'question': 'Which player has won the most UEFA Champions League titles?', 'options': [
+        'Cristiano Ronaldo', 'Francisco Gento', 'Luka Modric', 'Paolo Maldini'], 'correct': 1},
+
+    {'id': 64, 'question': 'Which club did Virgil van Dijk join Liverpool from?',
+        'options': ['Celtic', 'Southampton', 'Groningen', 'Lazio'], 'correct': 1},
+
+    {'id': 65, 'question': 'Who was the top scorer at the 2010 FIFA World Cup?', 'options': [
+        'David Villa', 'Wesley Sneijder', 'Thomas Muller', 'Diego Forlan'], 'correct': 2},
+
+    {'id': 66, 'question': 'Which nation won Euro 1992 despite not originally qualifying for the tournament?',
+        'options': ['Denmark', 'Sweden', 'Germany', 'Netherlands'], 'correct': 0},
+
+    {'id': 67, 'question': 'Which player scored the winning goal in the 2014 World Cup final?',
+        'options': ['Thomas Muller', 'Mario Gotze', 'Miroslav Klose', 'Andre Schurrle'], 'correct': 1},
+
+    {'id': 68, 'question': 'Which club has won the most FA Cups?', 'options': [
+        'Manchester United', 'Chelsea', 'Arsenal', 'Liverpool'], 'correct': 2},
+
+    {'id': 69, 'question': 'Who was the first African player to win the Ballon d\'Or?',
+        'options': ['Didier Drogba', 'George Weah', 'Samuel Eto\'o', 'Yaya Toure'], 'correct': 1},
+
+    {'id': 70, 'question': 'Which club did Erling Haaland join Manchester City from?',
+        'options': ['RB Salzburg', 'Molde', 'Borussia Dortmund', 'Leipzig'], 'correct': 2},
+    
+    {'id': 71, 'question': 'What was the name of the first FIFA World Cup trophy?', 'options': [
+        'The Victory Trophy', 'The Jules Rimet Trophy', 'The FIFA Trophy', 'The Golden Cup'], 'correct': 1},
+
+    {'id': 72, 'question': 'Which country won the first ever FIFA World Cup in 1930?',
+        'options': ['Argentina', 'Brazil', 'Uruguay', 'Italy'], 'correct': 2},
+
+    {'id': 73, 'question': 'Which country has won the most FIFA World Cups?',
+        'options': ['Germany', 'Italy', 'Argentina', 'Brazil'], 'correct': 3},
+
+    {'id': 74, 'question': 'Which of these countries has won the FIFA World Cup exactly twice?',
+        'options': ['Spain', 'France', 'England', 'Argentina'], 'correct': 1},
+
+    {'id': 75, 'question': 'Which country has reached three FIFA World Cup finals but never won the tournament?',
+        'options': ['Croatia', 'Hungary', 'Netherlands', 'Czechoslovakia'], 'correct': 2},
+
+    {'id': 76, 'question': 'Which three countries will jointly host the 2026 FIFA World Cup?', 'options': [
+        'United States, Canada and Mexico', 'United States, Mexico and Costa Rica', 'Canada, Mexico and Brazil', 'United States, Canada and Jamaica'], 'correct': 0},
+
+    {'id': 77, 'question': 'In which FIFA World Cup did Diego Maradona score the infamous "Hand of God" goal?',
+        'options': ['Spain 1982', 'Mexico 1986', 'Italy 1990', 'USA 1994'], 'correct': 1},
+
+    {'id': 78, 'question': 'Who holds the record for the most goals scored in FIFA World Cup history?',
+        'options': ['Ronaldo Nazario', 'Miroslav Klose', 'Gerd Muller', 'Lionel Messi'], 'correct': 1},
+
+    {'id': 79, 'question': 'Which person, alongside Mario Zagallo and Didier Deschamps, won the FIFA World Cup as both a player and a manager?',
+        'options': ['Franz Beckenbauer', 'Vicente del Bosque', 'Cesar Luis Menotti', 'Carlos Alberto Parreira'], 'correct': 0},
+
+    {'id': 80, 'question': 'Which English player won the FIFA World Cup Golden Boot in 1986?',
+        'options': ['Gary Lineker', 'Bobby Charlton', 'Geoff Hurst', 'Peter Shilton'], 'correct': 0},
+    
+    {'id': 81, 'question': 'Who is the only player to have won the UEFA Champions League with three different clubs?',
+        'options': ['Samuel Eto\'o', 'Cristiano Ronaldo', 'Clarence Seedorf', 'Zlatan Ibrahimovic'], 'correct': 2},
+
+    {'id': 82, 'question': 'Which manager is one of the three to have won the UEFA Champions League three times?',
+        'options': ['Sir Alex Ferguson', 'Bob Paisley', 'Jose Mourinho', 'Jupp Heynckes'], 'correct': 1},
+
+    {'id': 83, 'question': 'In which season was the European Cup rebranded as the UEFA Champions League?',
+        'options': ['1990/91', '1991/92', '1992/93', '1993/94'], 'correct': 2},
+
+    {'id': 84, 'question': 'Which team was the first from the United Kingdom to win the European Cup?',
+        'options': ['Manchester United', 'Liverpool', 'Celtic', 'Nottingham Forest'], 'correct': 2},
+
+    {'id': 85, 'question': 'Which Romanian club is the only team from Romania to have won the European Cup/Champions League?',
+        'options': ['Dinamo Bucharest', 'Rapid Bucharest', 'Universitatea Craiova', 'Steaua Bucharest'], 'correct': 3},
+
+    {'id': 86, 'question': 'Which English club has won the European Cup/Champions League twice?',
+        'options': ['Chelsea', 'Aston Villa', 'Nottingham Forest', 'Manchester City'], 'correct': 2},
+
+    {'id': 87, 'question': 'Who is the all-time top goalscorer in UEFA Champions League history?',
+        'options': ['Lionel Messi', 'Robert Lewandowski', 'Cristiano Ronaldo', 'Karim Benzema'], 'correct': 2},
+
+    {'id': 88, 'question': 'Which manager has won the most UEFA Champions League titles?', 'options': [
+        'Pep Guardiola', 'Zinedine Zidane', 'Carlo Ancelotti', 'Bob Paisley'], 'correct': 2},
+
+    {'id': 89, 'question': 'Which outfield player appeared in UEFA Champions League finals across three different decades?',
+        'options': ['Paolo Maldini', 'Ryan Giggs', 'Clarence Seedorf', 'Xavi'], 'correct': 1},
+    
+    {'id': 90, 'question': 'In which year was the first UEFA European Championship held?',
+        'options': ['1956', '1960', '1964', '1968'], 'correct': 1},
+
+    {'id': 91, 'question': 'Which nation has won the most UEFA European Championship titles?',
+        'options': ['Germany', 'France', 'Spain', 'Italy'], 'correct': 2},
+
+    {'id': 92, 'question': 'What is the name of the UEFA European Championship trophy?', 'options': [
+        'Jules Rimet Trophy', 'Henri Delaunay Trophy', 'Artemio Franchi Trophy', 'UEFA Nations Cup'], 'correct': 1},
+
+    {'id': 93, 'question': 'Who scored the most goals in a single UEFA European Championship tournament?',
+        'options': ['Cristiano Ronaldo', 'Antoine Griezmann', 'Michel Platini', 'Alan Shearer'], 'correct': 2},
+
+    {'id': 94, 'question': 'Who scored the Golden Goal that won Euro 2000 for France against Italy?',
+        'options': ['Thierry Henry', 'David Trezeguet', 'Sylvain Wiltord', 'Zinedine Zidane'], 'correct': 1},
+
+    {'id': 95, 'question': 'Which English player is one of England\'s joint-leading goalscorers in UEFA European Championship history?',
+        'options': ['Wayne Rooney', 'Gary Lineker', 'Alan Shearer', 'Michael Owen'], 'correct': 2},
+
+    {'id': 96, 'question': 'Which of these nations has never won the UEFA European Championship?',
+        'options': ['Belgium', 'Denmark', 'Greece', 'Portugal'], 'correct': 0},
+
+    {'id': 97, 'question': 'Which nation did Denmark replace at Euro 1992 before going on to win the tournament?',
+        'options': ['Soviet Union', 'Czechoslovakia', 'Yugoslavia', 'Romania'], 'correct': 2},
+
+    {'id': 98, 'question': 'In which year did the UEFA European Championship expand from 16 teams to 24 teams?',
+        'options': ['2008', '2012', '2016', '2020'], 'correct': 2},
+
+    {'id': 99, 'question': 'Who is the only person to have won the UEFA European Championship as both a player and a manager?',
+        'options': ['Franz Beckenbauer', 'Berti Vogts', 'Didier Deschamps', 'Luis Aragones'], 'correct': 1},
+
+    {'id': 100, 'question': 'Who is the all-time top goalscorer in Bundesliga history?',
+        'options': ['Robert Lewandowski', 'Klaus Fischer', 'Gerd Muller', 'Jupp Heynckes'], 'correct': 2},
+
+    {'id': 101, 'question': 'Which club has won five Bundesliga titles, making them one of the most successful clubs behind Bayern Munich?',
+        'options': ['Hamburg', 'Werder Bremen', 'Borussia Monchengladbach', 'Schalke 04'], 'correct': 2},
+
+    {'id': 102, 'question': 'Who is Germany\'s most-capped international player of all time?',
+        'options': ['Miroslav Klose', 'Bastian Schweinsteiger', 'Philipp Lahm', 'Lothar Matthaus'], 'correct': 3},
+
+    {'id': 103, 'question': 'Before Borussia Dortmund, Jurgen Klopp managed which German club?',
+        'options': ['Mainz 05', 'Stuttgart', 'Schalke 04', 'Hoffenheim'], 'correct': 0},
+
+    {'id': 104, 'question': 'Who became the youngest head coach in Bundesliga history at 28 years and 205 days old?',
+        'options': ['Thomas Tuchel', 'Julian Nagelsmann', 'Marco Rose', 'Domenico Tedesco'], 'correct': 1},
+
+    {'id': 105, 'question': 'Which animal appears on FC Koln\'s club crest?',
+        'options': ['A goat', 'A lion', 'An eagle', 'A horse'], 'correct': 0},
+
+    {'id': 106, 'question': 'RB Leipzig are commonly known by which nickname?', 'options': [
+        'The Eagles', 'The Red Bulls', 'The Wolves', 'The Miners'], 'correct': 1},
+
+    {'id': 107, 'question': 'How many FIFA World Cups has Germany won as a unified country?',
+        'options': ['None', 'Once', 'Twice', 'Four times'], 'correct': 1},
+
+    {'id': 108, 'question': 'Which German club, besides Bayern Munich and Borussia Dortmund, has won the European Cup/Champions League?',
+        'options': ['Borussia Monchengladbach', 'Hamburg', 'Werder Bremen', 'Schalke 04'], 'correct': 1},
+
+    {'id': 109, 'question': 'What is the nickname of Borussia Monchengladbach?', 'options': [
+        'The Colts', 'The Foals', 'The Stallions', 'The Stallions of the Rhine'], 'correct': 1},
+
+    {'id': 110, 'question': 'Gabriel Batistuta was a native of which South American country?',
+        'options': ['Uruguay', 'Argentina', 'Chile', 'Paraguay'], 'correct': 1},
+
+    {'id': 111, 'question': 'In which city does Ajax play their home matches?',
+        'options': ['Rotterdam', 'Eindhoven', 'Amsterdam', 'Utrecht'], 'correct': 2},
+
+    {'id': 112, 'question': 'Who defeated the Czech Republic in the final of Euro 1996?',
+        'options': ['Germany', 'France', 'Italy', 'Netherlands'], 'correct': 0},
+
+    {'id': 113, 'question': 'How many Italian clubs reached the quarter-finals of the UEFA Cup in the 1999/2000 season?',
+        'options': ['0', '1', '2', '3'], 'correct': 0},
+
+    {'id': 114, 'question': 'The Old Firm Derby is contested between Rangers and Celtic, but which city are both clubs based in?',
+        'options': ['Edinburgh', 'Belfast', 'Glasgow', 'Dundee'], 'correct': 2},
+
+    {'id': 115, 'question': 'Bray Wanderers, Bohemians, UCD and Kilkenny City are football clubs from which country?',
+        'options': ['Northern Ireland', 'Scotland', 'Wales', 'Republic of Ireland'], 'correct': 3},
+
+    {'id': 116, 'question': 'Which German club is known as Die Werkself (The Factory Team)?',
+        'options': ['Bayer Leverkusen', 'Eintracht Frankfurt', 'VfL Wolfsburg', 'Hannover 96'], 'correct': 0},    
+
+    {'id': 117, 'question': 'Which country won the first ever UEFA European Championship in 1960?',
+        'options': ['Soviet Union', 'Yugoslavia', 'Spain', 'Czechoslovakia'], 'correct': 0},
+
+    {'id': 118, 'question': 'Which nation is second only to Argentina in Copa America titles, with 15 victories?',
+        'options': ['Brazil', 'Uruguay', 'Chile', 'Paraguay'], 'correct': 1},
+
+    {'id': 119, 'question': 'Which country has won the most CONCACAF Gold Cup titles?',
+        'options': ['United States', 'Canada', 'Mexico', 'Costa Rica'], 'correct': 2},
+
+    {'id': 120, 'question': 'Who has scored the most goals in international football history?',
+        'options': ['Lionel Messi', 'Ali Daei', 'Cristiano Ronaldo', 'Ferenc Puskas'], 'correct': 2},
+
+    {'id': 121, 'question': 'Which England player has made the most appearances for the national team?',
+        'options': ['Wayne Rooney', 'David Beckham', 'Peter Shilton', 'Steven Gerrard'], 'correct': 2},
+
+    {'id': 122, 'question': 'Which African nation has progressed furthest in FIFA World Cup history?',
+        'options': ['Cameroon', 'Senegal', 'Ghana', 'Morocco'], 'correct': 3},
+
+    {'id': 123, 'question': 'Australia defeated which team 31-0 in a 2002 FIFA World Cup qualifier?',
+        'options': ['Fiji', 'Tonga', 'American Samoa', 'Cook Islands'], 'correct': 2},
+
+    {'id': 124, 'question': 'Who is the all-time leading goalscorer in Africa Cup of Nations history?',
+        'options': ['Didier Drogba', 'Samuel Eto\'o', 'Roger Milla', 'Hossam Hassan'], 'correct': 1},
+
+    {'id': 125, 'question': 'Which nation has won the AFC Asian Cup the most times?',
+        'options': ['South Korea', 'Saudi Arabia', 'Iran', 'Japan'], 'correct': 3},
+
+    {'id': 126, 'question': 'Which club has won the UEFA Cup/Europa League the most times?',
+        'options': ['Sevilla', 'Liverpool', 'Juventus', 'Inter Milan'], 'correct': 0},
+
+    {'id': 127, 'question': 'Which club ended Paris Saint-Germain\'s dominance by winning Ligue 1 in the 2020/21 season?',
+        'options': ['Monaco', 'Lyon', 'Marseille', 'LOSC Lille'], 'correct': 3},
+
+    {'id': 128, 'question': 'Of Cristiano Ronaldo and Lionel Messi, who has won the most La Liga titles?', 'options': [
+        'Cristiano Ronaldo', 'Lionel Messi', 'They have won the same number', 'Neither won more than five'], 'correct': 1},
+
+    {'id': 129, 'question': 'Which player shares the record for the most red cards in UEFA Champions League history alongside Edgar Davids and Zlatan Ibrahimovic?',
+        'options': ['Pepe', 'Sergio Ramos', 'Patrick Vieira', 'Roy Keane'], 'correct': 1},
+
+    {'id': 130, 'question': 'Which club won the inaugural UEFA Europa Conference League in the 2021/22 season?',
+        'options': ['Feyenoord', 'AS Roma', 'West Ham United', 'Leicester City'], 'correct': 1},
+
+    {'id': 131, 'question': 'Which Portuguese club has won the most Primeira Liga titles?',
+        'options': ['FC Porto', 'Sporting CP', 'Benfica', 'Braga'], 'correct': 2},
+    
+    {'id': 132, 'question': 'Which player has received the most yellow cards in Premier League history?',
+        'options': ['Lee Bowyer', 'Gareth Barry', 'Roy Keane', 'Mark Noble'], 'correct': 1},
+
+    {'id': 133, 'question': 'Who won the inaugural Premier League Golden Boot in the 1992/93 season?',
+        'options': ['Alan Shearer', 'Les Ferdinand', 'Teddy Sheringham', 'Ian Wright'], 'correct': 2},
+
+    {'id': 134, 'question': 'Which of these clubs has never played in the Premier League?',
+        'options': ['Oldham Athletic', 'Barnsley', 'Plymouth Argyle', 'Blackpool'], 'correct': 2},
+
+    {'id': 135, 'question': 'Which player has scored the most headed goals in Premier League history?',
+        'options': ['Harry Kane', 'Alan Shearer', 'Duncan Ferguson', 'Olivier Giroud'], 'correct': 0},
+
+    {'id': 136, 'question': 'Which manager has won the most Premier League Manager of the Month awards?',
+        'options': ['Arsene Wenger', 'Pep Guardiola', 'David Moyes', 'Sir Alex Ferguson'], 'correct': 3},
+
+    {'id': 137, 'question': 'Which Scottish player has scored the most goals in Premier League history?',
+        'options': ['Kenny Dalglish', 'Darren Fletcher', 'Duncan Ferguson', 'James McFadden'], 'correct': 2},
+
+    {'id': 138, 'question': 'Who has provided the most assists in Premier League history?',
+        'options': ['Cesc Fabregas', 'Wayne Rooney', 'Ryan Giggs', 'Kevin De Bruyne'], 'correct': 2},
+
+    {'id': 139, 'question': 'Which club has won the most Championship play-off finals?',
+        'options': ['West Ham United', 'Crystal Palace', 'Watford', 'Leicester City'], 'correct': 1},
+
+    {'id': 140, 'question': 'Which EFL club plays its home matches at St Andrew\'s?', 'options': [
+        'Coventry City', 'Birmingham City', 'West Bromwich Albion', 'Stoke City'], 'correct': 1},
+
+    {'id': 141, 'question': 'Which club has won the EFL Trophy the most times?', 'options': [
+        'Bristol City', 'Blackpool', 'Wigan Athletic', 'Peterborough United'], 'correct': 0},
+
+    {'id': 142, 'question': 'How many clubs compete across the Championship, League One and League Two?',
+        'options': ['60', '66', '72', '78'], 'correct': 2},
+
+    {'id': 143, 'question': 'The Bantams is the nickname of which EFL club?', 'options': [
+        'Barnsley', 'Bradford City', 'Burton Albion', 'Bristol Rovers'], 'correct': 1},
+
+    {'id': 144, 'question': 'Which club set the Championship record with 106 points in the 2005/06 season?',
+        'options': ['Sunderland', 'Reading', 'Burnley', 'Wolverhampton Wanderers'], 'correct': 1},
+
+    {'id': 145, 'question': 'When Bradford City reached the 2013 League Cup final, which division were they playing in?',
+        'options': ['Championship', 'League One', 'League Two', 'National League'], 'correct': 2},
+
+    {'id': 146, 'question': 'Which striker scored a record 43 goals in the Championship during the 2021/22 season?',
+        'options': ['Ivan Toney', 'Aleksandar Mitrovic', 'Teemu Pukki', 'Ollie Watkins'], 'correct': 1},
+
+    {'id': 147, 'question': 'Luton Town play their home matches at which stadium?', 'options': [
+        'The Den', 'Kenilworth Road', 'Loftus Road', 'Bloomfield Road'], 'correct': 1},
+
+    {'id': 148, 'question': 'Who was the first British player to move abroad to play professional football?',
+        'options': ['John Charles', 'Denis Law', 'Jimmy Greaves', 'Tom Finney'], 'correct': 0},
+
+    {'id': 149, 'question': 'Kevin Keegan won two Ballon d\'Or awards while playing for which German club?',
+        'options': ['Bayern Munich', 'Borussia Monchengladbach', 'Hamburg', 'Cologne'], 'correct': 2},
+
+    {'id': 150, 'question': 'Paul Lambert won the 1996/97 UEFA Champions League with which club?',
+        'options': ['Bayern Munich', 'Borussia Dortmund', 'Celtic', 'Juventus'], 'correct': 1},
+
+    {'id': 151, 'question': 'How much did Real Madrid pay to sign Jude Bellingham in 2023?',
+        'options': ['£81 million', '£88.5 million', '£104 million', '£95 million'], 'correct': 1},
+
+    {'id': 152, 'question': 'Paul Gascoigne left Tottenham Hotspur in 1992 to join which Italian club?',
+        'options': ['Juventus', 'AC Milan', 'Lazio', 'Roma'], 'correct': 2},
+
+    {'id': 153, 'question': 'How many UEFA Champions League titles did Gareth Bale win with Real Madrid?',
+        'options': ['Three', 'Four', 'Five', 'Six'], 'correct': 2},
+
+    {'id': 154, 'question': 'In which Asian country did Gary Lineker finish his playing career?',
+        'options': ['South Korea', 'China', 'Japan', 'Thailand'], 'correct': 2},
+
+    {'id': 155, 'question': 'Steven Gerrard played for Liverpool and which foreign club during his professional career?',
+        'options': ['LA Galaxy', 'New York City FC', 'LAFC', 'Inter Miami'], 'correct': 0},
+
+    {'id': 156, 'question': 'David Beckham played for Manchester United and which English club during his career?',
+        'options': ['Preston North End', 'Leeds United', 'Birmingham City', 'Nottingham Forest'], 'correct': 0},
+
+    {'id': 157, 'question': 'George Best played for how many different clubs in the United States?',
+        'options': ['Two', 'Three', 'Four', 'Five'], 'correct': 1},
+
+    {'id': 158, 'question': 'How much did Paris Saint-Germain pay to sign Neymar from Barcelona in 2017?',
+        'options': ['€180 million', '€200 million', '€222 million', '€250 million'], 'correct': 2},
+
+    {'id': 159, 'question': 'Which £80 million signing became the world\'s most expensive defender in 2019?',
+        'options': ['Virgil van Dijk', 'Harry Maguire', 'Matthijs de Ligt', 'Ruben Dias'], 'correct': 1},
+
+    {'id': 160, 'question': 'Who was the first British footballer to cost £1 million?', 'options': [
+        'Kevin Keegan', 'Trevor Francis', 'Bryan Robson', 'Kenny Dalglish'], 'correct': 1},
+
+    {'id': 161, 'question': 'Who is the most expensive goalkeeper in football history?', 'options': [
+        'Alisson Becker', 'Gianluigi Buffon', 'Kepa Arrizabalaga', 'Andre Onana'], 'correct': 2},
+
+    {'id': 162, 'question': 'Who was the first footballer to command a transfer fee of over £50 million?',
+        'options': ['Cristiano Ronaldo', 'Luis Figo', 'Zinedine Zidane', 'Kaka'], 'correct': 3},
+
+    {'id': 163, 'question': 'Who is the most expensive African footballer of all time?', 'options': [
+        'Victor Osimhen', 'Riyad Mahrez', 'Nicolas Pepe', 'Mohamed Salah'], 'correct': 2},
+
+    {'id': 164, 'question': 'Who became the first women\'s footballer to command a transfer fee of £1 million in 2025?',
+        'options': ['Sam Kerr', 'Olivia Smith', 'Lauren James', 'Aitana Bonmati'], 'correct': 1},
+
+    {'id': 165, 'question': 'How many transfers worth more than €70 million has Romelu Lukaku been involved in?',
+        'options': ['Two', 'Three', 'Four', 'Five'], 'correct': 1},
+
+    {'id': 166, 'question': 'Which non-European club ranks in the top 10 for spending in a single summer transfer window?',
+        'options': ['Al Nassr', 'Inter Miami', 'Al Hilal', 'Flamengo'], 'correct': 2},
+
+    {'id': 167, 'question': 'Real Madrid broke the world transfer record in 2001 by signing which player from Juventus?',
+        'options': ['Pavel Nedved', 'Zinedine Zidane', 'Edgar Davids', 'David Trezeguet'], 'correct': 1},
+
+    {'id': 168, 'question': 'In which year was the inaugural Major League Soccer season played?',
+        'options': ['1994', '1995', '1996', '1998'], 'correct': 2},
+
+    {'id': 169, 'question': 'What is the name of the trophy awarded to the team with the best regular-season record in MLS?',
+        'options': ['MLS Cup', 'Commissioner\'s Trophy', 'Supporters\' Shield', 'Founders Cup'], 'correct': 2},
+
+    {'id': 170, 'question': 'Who is Major League Soccer\'s all-time leading goalscorer?',
+        'options': ['Landon Donovan', 'Chris Wondolowski', 'Josef Martinez', 'Bradley Wright-Phillips'], 'correct': 1},
+
+    {'id': 171, 'question': 'Which former Barcelona player joined Lionel Messi at Inter Miami in 2023?',
+        'options': ['Sergio Busquets', 'Gerard Pique', 'Andres Iniesta', 'Dani Alves'], 'correct': 0},
+
+    {'id': 172, 'question': 'Which club competes in the Cascadia Cup?', 'options': [
+        'LA Galaxy', 'Seattle Sounders', 'Real Salt Lake', 'Minnesota United'], 'correct': 1},
+
+    {'id': 173, 'question': 'Which Italian playmaker scored an MLS-record 13 free-kick goals for Toronto FC between 2015 and 2018?',
+        'options': ['Andrea Pirlo', 'Sebastian Giovinco', 'Alessandro Del Piero', 'Marco Verratti'], 'correct': 1},
+
+    {'id': 174, 'question': 'Which MLS club plays its home matches at Sports Illustrated Stadium?', 'options': [
+        'New York City FC', 'New York Red Bulls', 'Philadelphia Union', 'DC United'], 'correct': 1},
+
+    {'id': 175, 'question': 'What is the official term used to describe the process by which a new team joins Major League Soccer?',
+        'options': ['Expansion', 'Admission', 'Promotion', 'Franchising'], 'correct': 0},
+
+    {'id': 176, 'question': 'Sporting Kansas City was known by what name between 1997 and 2010?', 'options': [
+        'Kansas City United', 'Kansas City Wizards', 'Missouri Wizards', 'Sporting Missouri'], 'correct': 1},
+
+    {'id': 177, 'question': 'Which player, once dubbed "the next Pele", was selected first overall in the 2004 MLS SuperDraft?',
+        'options': ['Clint Dempsey', 'Jozy Altidore', 'Freddy Adu', 'Michael Bradley'], 'correct': 2},
+
+    {'id': 178, 'question': 'Which of these clubs has won Ligue 1?',
+        'options': ['Auxerre', 'Toulouse', 'Metz', 'Cannes'], 'correct': 0},
+
+    {'id': 179, 'question': 'Which is the oldest football club in France?',
+        'options': ['Le Havre', 'Metz', 'Strasbourg', 'Lille'], 'correct': 0},
+
+    {'id': 180, 'question': 'Which French club was the first to reach a European Cup/Champions League final?',
+        'options': ['Reims', 'Marseille', 'Saint-Etienne', 'Monaco'], 'correct': 0},
+
+    {'id': 181, 'question': 'How many consecutive Ligue 1 titles did Lyon win during the 2000s?',
+        'options': ['5', '6', '7', '8'], 'correct': 2},
+
+    {'id': 182, 'question': 'Which manager is the only person to have won both the UEFA European Championship and the Africa Cup of Nations?',
+        'options': ['Jacques Santini', 'Claude Le Roy', 'Roger Lemerre', 'Herve Renard'], 'correct': 2},
+
+    {'id': 183, 'question': 'After Paris Saint-Germain, which club has won the second-most Ligue 1 titles?',
+        'options': ['Marseille', 'Lyon', 'Monaco', 'Saint-Etienne'], 'correct': 3},
+
+    {'id': 184, 'question': 'Aime Jacquet guided France to World Cup glory in 1998, but which club did he manage to a Ligue 1 title?',
+        'options': ['Saint-Etienne', 'Bordeaux', 'Nantes', 'Lille'], 'correct': 1},
+
+    {'id': 185, 'question': 'Which of these clubs has never won Ligue 1?',
+        'options': ['Rennes', 'Lens', 'Nice', 'Sochaux'], 'correct': 0},
+
+    {'id': 186, 'question': 'Jules Rimet, the man behind the creation of the FIFA World Cup, founded which football club?',
+        'options': ['Red Star', 'Metz', 'Amiens', 'Valenciennes'], 'correct': 0},
+
+    {'id': 187, 'question': 'Which manager is the only person to have won the Africa Cup of Nations with two different countries?',
+        'options': ['Bruno Metsu', 'Philippe Troussier', 'Roger Lemerre', 'Herve Renard'], 'correct': 3},
+
+    {'id': 188, 'question': 'Which club has spent the most seasons in the French top flight?',
+        'options': ['Monaco', 'Bordeaux', 'Lyon', 'Marseille'], 'correct': 3},
+
+    {'id': 189, 'question': 'Which manager has won the most Ligue 1 titles?', 'options': [
+        'Aime Jacquet', 'Guy Roux', 'Gerard Houllier', 'Albert Batteux'], 'correct': 3},
+
+    {'id': 190, 'question': 'With which club did Arsene Wenger win Ligue 1 as a player?',
+        'options': ['Monaco', 'Strasbourg', 'Saint-Etienne', 'Bordeaux'], 'correct': 1},
+
+    {'id': 191, 'question': 'The all-time top scorer in Ligue 1 history was born in which country?',
+        'options': ['France', 'Sweden', 'Argentina', 'Brazil'], 'correct': 2},
+
+    {'id': 192, 'question': 'Which French player is correctly matched to his family heritage?', 'options': [
+        'Zinedine Zidane - Tunisia', 'Blaise Matuidi - Cameroon', 'Paul Pogba - Senegal', 'Ngolo Kante - Mali'], 'correct': 3},
+
+    {'id': 193, 'question': 'Which manager guided Paris Saint-Germain to their first Ligue 1 title?',
+        'options': ['Arsene Wenger', 'Artur Jorge', 'Georges Peyroche', 'Gerard Houllier'], 'correct': 3},
+
+    {'id': 194, 'question': 'Which pair of players were NOT teammates at club level?', 'options': [
+        'Claude Puel & Youri Djorkaeff', 'Arsene Wenger & Raymond Domenech', 'Zinedine Zidane & Didier Deschamps', 'Nicolas Anelka & Robert Pires'], 'correct': 3},
+
+    {'id': 195, 'question': 'Which player has won the most Ligue 1 Top Goalscorer awards?', 'options': [
+        'Jean-Pierre Papin', 'Kylian Mbappe', 'Delio Onnis', 'Carlos Bianchi'], 'correct': 1},
+
+    
 ]
 
 
