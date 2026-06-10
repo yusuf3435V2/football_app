@@ -12,6 +12,7 @@ const state = {
     totalQuestions: 10,
     timeLeft: 5,
     answered: false,
+    screenFlash: '',
     scores: {},
     finalScores: {},
     winner: null,
@@ -73,6 +74,8 @@ socket.on('game_started', (data) => {
     state.gameState = 'quiz';
     state.timeLeft = 5;
     state.answered = false;
+    state.answerResult = null;
+    state.screenFlash = '';
     startTimer();
     render();
 });
@@ -84,6 +87,8 @@ socket.on('question_answered', (data) => {
     state.scores = data.scores;
     state.timeLeft = 5;
     state.answered = false;
+    state.answerResult = null;
+    state.screenFlash = '';
     startTimer();
     render();
 });
@@ -107,6 +112,17 @@ socket.on('room_updated', (data) => {
     if (currentPlayer) {
         state.isPlayerReady = currentPlayer.is_ready;
     }
+
+    render();
+});
+
+socket.on('answer_result', (data) => {
+    const myResult = data.results[socket.id];
+
+    if (!myResult) return;
+
+    state.answerResult = myResult;
+    state.screenFlash = myResult.is_correct ? 'flash-correct' : 'flash-wrong';
 
     render();
 });
@@ -173,6 +189,7 @@ function handleReadyClick() {
 function handleAnswerClick(index) {
     if (!state.answered) {
         state.answered = true;
+        state.screenFlash = 'flash-locked';
         socket.emit('submit_answer', {
             answer_index: index
         });
@@ -314,7 +331,7 @@ function renderStarting() {
 function renderQuiz() {
     if (!state.currentQuestion) {
         return `
-            <div class="app">
+            <div class="app ${state.screenFlash}">
                 <div class="quiz-container">
                     <h2>Loading next question...</h2>
                 </div>

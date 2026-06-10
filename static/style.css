@@ -615,3 +615,45 @@ body::before {
         gap: 20px;
     }
 }
+
+.flash-locked {
+    animation: lockedFlash 0.4s ease-in-out;
+}
+
+.flash-correct {
+    animation: correctFlash 1.2s ease-in-out;
+}
+
+.flash-wrong {
+    animation: wrongFlash 1.2s ease-in-out;
+}
+
+@keyframes lockedFlash {
+    0% {
+        background-color: rgba(255, 107, 53, 0);
+    }
+    50% {
+        background-color: rgba(255, 107, 53, 0.25);
+    }
+    100% {
+        background-color: rgba(255, 107, 53, 0);
+    }
+}
+
+@keyframes correctFlash {
+    0%, 100% {
+        background-color: rgba(39, 174, 96, 0);
+    }
+    50% {
+        background-color: rgba(39, 174, 96, 0.35);
+    }
+}
+
+@keyframes wrongFlash {
+    0%, 100% {
+        background-color: rgba(231, 76, 60, 0);
+    }
+    50% {
+        background-color: rgba(231, 76, 60, 0.35);
+    }
+}

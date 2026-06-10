@@ -590,8 +590,10 @@ class GameRoom:
         )
 
     def evaluate_answers(self):
-        """Mark answers and update scores."""
+        """Mark answers, update scores, and return each player's result."""
         question = self.selected_questions[self.current_question_index]
+        results = {}
+
         for player in self.players.values():
             selected_answer = player['current_answer']
             is_correct = selected_answer == question['correct']
@@ -604,7 +606,16 @@ class GameRoom:
                 'selected': selected_answer,
                 'is_correct': is_correct,
             })
+
+            results[player['id']] = {
+                'is_correct': is_correct,
+                'selected': selected_answer,
+                'correct': question['correct'],
+            }
+
             player['current_answer'] = None
+
+        return results
 
     def move_to_next_question(self):
         """Move to the next question and return whether one exists."""
@@ -841,8 +852,16 @@ def evaluate_and_next_question(room_code):
         room.question_timeout.cancel()
         room.question_timeout = None
 
-    room.evaluate_answers()
+    results = room.evaluate_answers()
+
+
     room.is_evaluating = False
+
+    socketio.emit('answer_result', {
+        'results': results,
+    }, to=room_code)
+
+    time.sleep(1.2)
 
     if room.move_to_next_question():
         socketio.emit('question_answered', {
