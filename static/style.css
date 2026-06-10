@@ -465,7 +465,7 @@ body::before {
 .answer-submitted {
     margin-top: 15px;
     padding: 15px;
-    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
     color: white;
     border-radius: 8px;
     text-align: center;

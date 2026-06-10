@@ -340,7 +340,7 @@ function renderQuiz() {
     }
 
     return `
-        <div class="app">
+        <div class="app ${state.screenFlash}">
             <div class="quiz-container">
                 <div class="quiz-header">
                     <div class="question-counter">
