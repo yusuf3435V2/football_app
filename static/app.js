@@ -380,8 +380,12 @@ function renderQuiz() {
                     `).join('')}
                 </div>
 
-                ${state.answered ? `
-                    <div class="answer-submitted">✅ Answer Submitted!</div>
+                ${state.answerResult ? `
+                    <div class="answer-result ${state.answerResult.is_correct ? 'correct' : 'wrong'}">
+                        ${state.answerResult.is_correct ? '✅ Correct!' : '❌ Wrong!'}
+                    </div>
+                ` : state.answered ? `
+                    <div class="answer-submitted">🔒 Answer Locked In!</div>
                 ` : ''}
             </div>
         </div>

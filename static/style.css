@@ -616,44 +616,71 @@ body::before {
     }
 }
 
-.flash-locked {
-    animation: lockedFlash 0.4s ease-in-out;
+/* Full-screen feedback flashes */
+.app.flash-locked::after,
+.app.flash-correct::after,
+.app.flash-wrong::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
 }
 
-.flash-correct {
-    animation: correctFlash 1.2s ease-in-out;
+.app.flash-locked::after {
+    background: rgba(255, 107, 53, 0.35);
+    animation: lockedOverlay 0.5s ease-out forwards;
 }
 
-.flash-wrong {
-    animation: wrongFlash 1.2s ease-in-out;
+.app.flash-correct::after {
+    background: rgba(39, 174, 96, 0.45);
+    animation: resultOverlay 1.2s ease-out forwards;
 }
 
-@keyframes lockedFlash {
+.app.flash-wrong::after {
+    background: rgba(231, 76, 60, 0.45);
+    animation: resultOverlay 1.2s ease-out forwards;
+}
+
+@keyframes lockedOverlay {
     0% {
-        background-color: rgba(255, 107, 53, 0);
-    }
-    50% {
-        background-color: rgba(255, 107, 53, 0.25);
+        opacity: 0;
     }
     100% {
-        background-color: rgba(255, 107, 53, 0);
+        opacity: 1;
     }
 }
 
-@keyframes correctFlash {
-    0%, 100% {
-        background-color: rgba(39, 174, 96, 0);
+@keyframes resultOverlay {
+    0% {
+        opacity: 0;
     }
-    50% {
-        background-color: rgba(39, 174, 96, 0.35);
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
     }
 }
 
-@keyframes wrongFlash {
-    0%, 100% {
-        background-color: rgba(231, 76, 60, 0);
-    }
-    50% {
-        background-color: rgba(231, 76, 60, 0.35);
-    }
+.answer-result {
+    margin-top: 15px;
+    padding: 15px;
+    color: white;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.answer-result.correct {
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+}
+
+.answer-result.wrong {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
 }
