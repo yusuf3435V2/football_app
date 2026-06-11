@@ -16,7 +16,8 @@ const state = {
     scores: {},
     finalScores: {},
     winner: null,
-    isPlayerReady: false
+    isPlayerReady: false,
+    isHost: false
 };
 
 // Socket event listeners
@@ -27,6 +28,7 @@ socket.on('error', (data) => {
 socket.on('room_created', (data) => {
     state.roomCode = data.room_code;
     state.players = data.players;
+    state.isHost = data.is_host;
     state.gameState = 'waiting';
     state.isPlayerReady = false;
     render();
@@ -35,6 +37,7 @@ socket.on('room_created', (data) => {
 socket.on('room_joined', (data) => {
     state.roomCode = data.room_code;
     state.players = data.players;
+    state.isHost = data.is_host;
     state.gameState = 'waiting';
     state.isPlayerReady = false;
     render();
@@ -100,6 +103,9 @@ socket.on('game_ended', (data) => {
     state.finalScores = data.final_scores;
     state.winner = data.winner;
     render();
+    setTimeout(() => {
+        resetToMenu();
+    }, 8000);
 });
 
 socket.on('room_updated', (data) => {
@@ -125,6 +131,16 @@ socket.on('answer_result', (data) => {
     state.screenFlash = myResult.is_correct ? 'flash-correct' : 'flash-wrong';
 
     render();
+});
+
+socket.on('room_closed', (data) => {
+
+    alert(data.message);
+
+    setTimeout(() => {
+        resetToMenu();
+    }, 3000);
+
 });
 
 // Timer management
@@ -186,6 +202,10 @@ function handleReadyClick() {
     }
 }
 
+function handleCloseRoom() {
+    socket.emit('close_room');
+}
+
 function handleAnswerClick(index) {
     if (!state.answered) {
         state.answered = true;
@@ -212,6 +232,30 @@ function handlePlayAgain() {
     state.finalScores = {};
     state.winner = null;
     state.isPlayerReady = false;
+
+    render();
+}
+
+function resetToMenu() {
+
+    if (timerInterval) clearInterval(timerInterval);
+
+    state.gameState = 'menu';
+    state.roomCode = '';
+    state.players = [];
+    state.currentQuestion = null;
+    state.questionNumber = 0;
+
+    state.answered = false;
+    state.answerResult = null;
+    state.screenFlash = '';
+
+    state.scores = {};
+    state.finalScores = {};
+    state.winner = null;
+
+    state.isPlayerReady = false;
+    state.isHost = false;
 
     render();
 }
@@ -300,6 +344,14 @@ function renderWaiting() {
                     >
                         ${state.isPlayerReady ? '✅ YOU ARE READY!' : '🎮 Ready Up to Play'}
                     </button>
+                ${state.isHost ? `
+                    <button
+                        class="btn btn-danger"
+                        onclick="handleCloseRoom()"
+                    >
+                        ❌ Close Room
+                    </button>
+                ` : ''}
                 ` : `
                     <div class="spinner"></div>
                     <p class="info">📱 Share this code with your friend: <strong style="font-size: 18px; color: #ff6b35;">${state.roomCode}</strong></p>
@@ -416,12 +468,16 @@ function renderResults() {
                         `).join('')}
                     </div>
                 </div>
-
+                <p class="info">
+                    Returning to lobby in 8 seconds...
+                </p>
                 <button class="btn btn-primary" onclick="handlePlayAgain()">⬅️ Back to Menu</button>
             </div>
         </div>
     `;
 }
+
+
 
 // Initial render
 render();

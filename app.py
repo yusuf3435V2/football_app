@@ -520,6 +520,7 @@ class GameRoom:
         self.game_ended = False
         self.question_timeout = None
         self.is_evaluating = False
+        self.host_id = None
 
     def add_player(self, player_id, player_name):
         """Add a player if the room is not full and the game has not started."""
@@ -709,11 +710,13 @@ def handle_create_room(data):
     room = GameRoom(room_code)
     room.add_player(sid, player_name)
     rooms[room_code] = room
+    room.host_sid = request.sid
     join_room(room_code)
 
     emit('room_created', {
         'room_code': room_code,
-        'players': room.get_player_statuses()
+        'players': room.get_player_statuses(),
+        'is_host': True
     })
 
     print(f'Room created: {room_code} by {player_name}')
@@ -744,7 +747,8 @@ def handle_join_room(data):
     # Send the joining player to the waiting room
     emit('room_joined', {
         'room_code': room_code,
-        'players': room.get_player_statuses()
+        'players': room.get_player_statuses(),
+        'is_host': False
     })
 
     # Update everyone in the room, including player 1
@@ -892,6 +896,24 @@ def end_game(room_code):
         'winner': {'name': winner['name'], 'score': winner['score']},
     }, to=room_code)
 
+
+@socketio.on('close_room')
+def close_room():
+    for room_code, room in rooms.items():
+
+        if room.host_sid == request.sid:
+
+            socketio.emit(
+                'room_closed',
+                {
+                    'message': 'The host closed the room.'
+                },
+                room=room_code
+            )
+
+            del rooms[room_code]
+
+            break
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)
