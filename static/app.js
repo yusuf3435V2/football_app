@@ -17,7 +17,9 @@ const state = {
     finalScores: {},
     winner: null,
     isPlayerReady: false,
-    isHost: false
+    isHost: false,
+    rematchPlayers: [],
+    rematchRequested: false
 };
 
 // Socket event listeners
@@ -102,10 +104,10 @@ socket.on('game_ended', (data) => {
     state.gameState = 'results';
     state.finalScores = data.final_scores;
     state.winner = data.winner;
+    state.rematchPlayers = [];
+    state.rematchRequested = false;
+
     render();
-    setTimeout(() => {
-        resetToMenu();
-    }, 8000);
 });
 
 socket.on('room_updated', (data) => {
@@ -141,6 +143,40 @@ socket.on('room_closed', (data) => {
         resetToMenu();
     }, 3000);
 
+});
+
+socket.on('rematch_updated', (data) => {
+    state.rematchPlayers = data.players || [];
+
+    const currentPlayer = state.rematchPlayers.find(player => player.name === state.playerName);
+
+    if (currentPlayer) {
+        state.rematchRequested = currentPlayer.wants_rematch;
+    }
+
+    render();
+});
+
+socket.on('rematch_ready', (data) => {
+    if (timerInterval) clearInterval(timerInterval);
+
+    state.gameState = 'waiting';
+    state.roomCode = data.room_code;
+    state.players = data.players;
+    state.currentQuestion = null;
+    state.questionNumber = 0;
+    state.timeLeft = 5;
+    state.answered = false;
+    state.answerResult = null;
+    state.screenFlash = '';
+    state.scores = {};
+    state.finalScores = {};
+    state.winner = null;
+    state.isPlayerReady = false;
+    state.rematchPlayers = [];
+    state.rematchRequested = false;
+
+    render();
 });
 
 // Timer management
@@ -234,6 +270,14 @@ function handlePlayAgain() {
     state.isPlayerReady = false;
 
     render();
+}
+
+function handleRematchClick() {
+    if (!state.rematchRequested) {
+        state.rematchRequested = true;
+        socket.emit('request_rematch');
+        render();
+    }
 }
 
 function resetToMenu() {
@@ -468,10 +512,34 @@ function renderResults() {
                         `).join('')}
                     </div>
                 </div>
-                <p class="info">
-                    Returning to lobby in 8 seconds...
-                </p>
-                <button class="btn btn-primary" onclick="handlePlayAgain()">⬅️ Back to Menu</button>
+                <div class="rematch-section">
+                <h3>🔁 Rematch?</h3>
+
+                <div class="players-list">
+                    ${state.rematchPlayers.length > 0 ? state.rematchPlayers.map(player => `
+                        <div class="player-item">
+                            <span class="player-name">👤 ${player.name}</span>
+                            <span class="player-status ${player.wants_rematch ? 'ready' : 'not-ready'}">
+                                ${player.wants_rematch ? '✅ REMATCH' : '⏸ WAITING'}
+                            </span>
+                        </div>
+                    `).join('') : `
+                        <p class="info">Waiting for rematch votes...</p>
+                    `}
+                </div>
+
+                <button
+                    class="btn btn-primary ${state.rematchRequested ? 'ready-btn-active' : ''}"
+                    onclick="handleRematchClick()"
+                    ${state.rematchRequested ? 'disabled' : ''}
+                >
+                    ${state.rematchRequested ? '✅ Rematch Requested' : '🔁 Request Rematch'}
+                </button>
+
+                <button class="btn btn-secondary" onclick="handlePlayAgain()">
+                    ⬅️ Back to Menu
+                </button>
+            </div>
             </div>
         </div>
     `;

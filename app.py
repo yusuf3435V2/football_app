@@ -521,6 +521,7 @@ class GameRoom:
         self.question_timeout = None
         self.is_evaluating = False
         self.host_id = None
+        self.rematch_votes = {}
 
     def add_player(self, player_id, player_name):
         """Add a player if the room is not full and the game has not started."""
@@ -558,10 +559,12 @@ class GameRoom:
         self.game_started = True
         self.game_ended = False
         self.is_evaluating = False
+        self.rematch_votes = {}
         for player in self.players.values():
             player['score'] = 0
             player['current_answer'] = None
             player['answers'] = []
+            player['is_ready'] = False
 
     def get_player_statuses(self):
         """Return player names and ready statuses for the waiting room."""
@@ -570,6 +573,17 @@ class GameRoom:
             for player in self.players.values()
         ]
 
+    def get_rematch_statuses(self):
+        """Return each player's rematch vote status."""
+        return [
+            {
+                'id': player['id'],
+                'name': player['name'],
+                'wants_rematch': self.rematch_votes.get(player['id'], False),
+            }
+            for player in self.players.values()
+        ]
+    
     def get_question_data(self):
         """Return the current question without revealing the correct answer."""
         question = self.selected_questions[self.current_question_index]
@@ -839,6 +853,43 @@ def handle_submit_answer(data):
             room.question_timeout.cancel()
         socketio.start_background_task(evaluate_after_short_delay, room_code)
 
+
+@socketio.on('request_rematch')
+def handle_request_rematch():
+    """Handle a player's rematch vote."""
+    sid = request.sid
+    room_code, room = get_room_for_player(sid)
+
+    if not room or not room.game_ended:
+        return
+
+    room.rematch_votes[sid] = True
+
+    socketio.emit('rematch_updated', {
+        'players': room.get_rematch_statuses(),
+    }, to=room_code)
+
+    if len(room.players) == 2 and all(
+        room.rematch_votes.get(player_id, False)
+        for player_id in room.players
+    ):
+        room.game_started = False
+        room.game_ended = False
+        room.current_question_index = 0
+        room.selected_questions = []
+        room.is_evaluating = False
+        room.rematch_votes = {}
+
+        for player in room.players.values():
+            player['score'] = 0
+            player['current_answer'] = None
+            player['answers'] = []
+            player['is_ready'] = False
+
+        socketio.emit('rematch_ready', {
+            'room_code': room_code,
+            'players': room.get_player_statuses(),
+        }, to=room_code)
 
 def evaluate_after_short_delay(room_code):
     """Briefly show answer-submitted feedback before moving on."""

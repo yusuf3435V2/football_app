@@ -143,6 +143,29 @@ body::before {
     cursor: not-allowed;
 }
 
+.btn-secondary {
+    background: #1a472a;
+    color: white;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(26, 71, 42, 0.4);
+}
+
+.rematch-section {
+    margin-top: 30px;
+}
+
+.rematch-section h3 {
+    color: #1a472a;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+}
+
 .ready-btn-active {
     background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
 }
