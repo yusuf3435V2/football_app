@@ -1,6 +1,18 @@
 // Initialize socket connection
 const socket = io();
 
+const sounds = {
+    click: new Audio('/static/sounds/click.mp3'),
+    tick: new Audio('/static/sounds/tick.mp3'),
+    correct: new Audio('/static/sounds/correct.mp3'),
+    wrong: new Audio('/static/sounds/wrong.mp3')
+};
+
+function playSound(sound) {
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+}
+
 // Game state management
 const state = {
     gameState: 'menu',
@@ -132,6 +144,12 @@ socket.on('answer_result', (data) => {
     state.answerResult = myResult;
     state.screenFlash = myResult.is_correct ? 'flash-correct' : 'flash-wrong';
 
+    if (myResult.is_correct) {
+        playSound(sounds.correct);
+    } else {
+        playSound(sounds.wrong);
+    }
+
     render();
 });
 
@@ -189,6 +207,9 @@ function startTimer() {
 
     timerInterval = setInterval(() => {
         state.timeLeft -= 1;
+        if (state.timeLeft <= 3 && state.timeLeft > 0) {
+            playSound(sounds.tick);
+        }
         render();
 
         if (state.timeLeft <= 0) {
@@ -244,6 +265,7 @@ function handleCloseRoom() {
 
 function handleAnswerClick(index) {
     if (!state.answered) {
+        playSound(sounds.click);
         state.answered = true;
         state.screenFlash = 'flash-locked';
         socket.emit('submit_answer', {
