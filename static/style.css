@@ -470,7 +470,7 @@ body::before {
     flex: 1;
 }
 
-.player-name {
+.score-item .player-name {
     font-size: 14px;
     color: #fff;
     font-weight: 700;
