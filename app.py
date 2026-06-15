@@ -852,15 +852,15 @@ def get_sudden_death_times(room):
         key=lambda item: item['answer_time'] if item['answer_time'] is not None else 999
     )
 
-def end_sudden_death(room_code, winner_id):
-    """End sudden death and declare the fastest correct player as winner."""
+
+def emit_sudden_death_result_after_delay(room_code, winner_id):
+    """Give players time to see correct/wrong feedback before showing final result."""
+    time.sleep(1.5)
+
     room = rooms.get(room_code)
 
-    if not room or room.game_ended:
+    if not room:
         return
-
-    room.game_ended = True
-    room.is_sudden_death = False
 
     winner = room.players[winner_id]
 
@@ -879,9 +879,8 @@ def end_sudden_death(room_code, winner_id):
         },
     }, to=room_code)
 
-
-def end_sudden_death_draw(room_code):
-    """End sudden death as a draw."""
+def end_sudden_death(room_code, winner_id):
+    """End sudden death and declare the fastest correct player as winner."""
     room = rooms.get(room_code)
 
     if not room or room.game_ended:
@@ -889,6 +888,22 @@ def end_sudden_death_draw(room_code):
 
     room.game_ended = True
     room.is_sudden_death = False
+
+    socketio.start_background_task(
+        emit_sudden_death_result_after_delay,
+        room_code,
+        winner_id
+    )
+
+
+def emit_sudden_death_draw_after_delay(room_code):
+    """Give players time to see wrong feedback before showing draw result."""
+    time.sleep(1.5)
+
+    room = rooms.get(room_code)
+
+    if not room:
+        return
 
     final_scores = {
         player['name']: player['score']
@@ -905,6 +920,22 @@ def end_sudden_death_draw(room_code):
             'sudden_death_times': get_sudden_death_times(room),
         },
     }, to=room_code)
+
+
+def end_sudden_death_draw(room_code):
+    """End sudden death as a draw."""
+    room = rooms.get(room_code)
+
+    if not room or room.game_ended:
+        return
+
+    room.game_ended = True
+    room.is_sudden_death = False
+
+    socketio.start_background_task(
+        emit_sudden_death_draw_after_delay,
+        room_code
+    )
 
 def handle_sudden_death_answer(room_code, room, player_id, answer_index):
     """Handle sudden death answers where fastest correct answer wins."""
