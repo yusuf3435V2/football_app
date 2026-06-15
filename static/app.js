@@ -583,7 +583,9 @@ function renderResults() {
                                     </span>
 
                                     <span>
-                                        ${player.answer_time !== null
+                                        ${player.timed_out
+                                        ? 'No answer'
+                                        : player.answer_time !== null
                                             ? `${player.answer_time.toFixed(2)}s`
                                             : '--'}
                                     </span>

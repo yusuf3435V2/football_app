@@ -844,6 +844,7 @@ def get_sudden_death_times(room):
             'name': player['name'],
             'is_correct': answer_data.get('is_correct', False),
             'answer_time': round(answer_time, 2) if answer_time is not None else None,
+            'timed_out': answer_data.get('timed_out', False),
         })
 
     return sorted(
@@ -939,39 +940,7 @@ def handle_sudden_death_answer(room_code, room, player_id, answer_index):
         }
     }, to=player_id)
 
-    # Wait until both players have answered before deciding sudden death.
-    if len(room.sudden_death_answers) < len(room.players):
-        return
-
-    correct_answers = [
-        {
-            'player_id': answer_player_id,
-            'answered_at': answer_data['answered_at'],
-        }
-        for answer_player_id, answer_data in room.sudden_death_answers.items()
-        if answer_data['is_correct']
-    ]
-
-    # Both players got it wrong.
-    if len(correct_answers) == 0:
-        end_sudden_death_draw(room_code)
-        return
-
-    # Only one player got it correct.
-    if len(correct_answers) == 1:
-        end_sudden_death(room_code, winner_id=correct_answers[0]['player_id'])
-        return
-
-    # Both players got it correct. Fastest wins.
-    correct_answers.sort(key=lambda answer: answer['answered_at'])
-
-    first_answer = correct_answers[0]
-    second_answer = correct_answers[1]
-
-    if first_answer['answered_at'] == second_answer['answered_at']:
-        end_sudden_death_draw(room_code)
-    else:
-        end_sudden_death(room_code, winner_id=first_answer['player_id'])
+    decide_sudden_death(room_code)
 
 def schedule_question_timeout(room_code):
     """Schedule automatic question evaluation after 5 seconds."""
@@ -1058,6 +1027,79 @@ def is_game_tied(room):
     return len(scores) == 2 and scores[0] == scores[1]
 
 
+def decide_sudden_death(room_code):
+    """Decide sudden death once both players have answered or timed out."""
+    room = rooms.get(room_code)
+
+    if not room or room.game_ended:
+        return
+
+    if len(room.sudden_death_answers) < len(room.players):
+        return
+
+    if room.question_timeout:
+        room.question_timeout.cancel()
+        room.question_timeout = None
+
+    correct_answers = [
+        {
+            'player_id': answer_player_id,
+            'answered_at': answer_data['answered_at'],
+        }
+        for answer_player_id, answer_data in room.sudden_death_answers.items()
+        if answer_data['is_correct']
+    ]
+
+    if len(correct_answers) == 0:
+        end_sudden_death_draw(room_code)
+        return
+
+    if len(correct_answers) == 1:
+        end_sudden_death(room_code, winner_id=correct_answers[0]['player_id'])
+        return
+
+    correct_answers.sort(key=lambda answer: answer['answered_at'])
+
+    first_answer = correct_answers[0]
+    second_answer = correct_answers[1]
+
+    if first_answer['answered_at'] == second_answer['answered_at']:
+        end_sudden_death_draw(room_code)
+    else:
+        end_sudden_death(room_code, winner_id=first_answer['player_id'])
+
+def evaluate_sudden_death_timeout(room_code):
+    """Force sudden death to finish after 5 seconds."""
+    room = rooms.get(room_code)
+
+    if not room or room.game_ended or not room.is_sudden_death:
+        return
+
+    question = room.selected_questions[room.current_question_index]
+
+    for player_id, player in room.players.items():
+        if player_id not in room.sudden_death_answers:
+            room.sudden_death_answers[player_id] = {
+                'selected': None,
+                'is_correct': False,
+                'answered_at': None,
+                'answer_time': None,
+                'timed_out': True,
+            }
+
+            socketio.emit('answer_result', {
+                'results': {
+                    player_id: {
+                        'is_correct': False,
+                        'selected': None,
+                        'correct': question['correct'],
+                        'timed_out': True,
+                    }
+                }
+            }, to=player_id)
+
+    decide_sudden_death(room_code)
+
 def start_sudden_death_delayed(room_code):
     """Wait briefly before showing the sudden death question."""
     time.sleep(3)
@@ -1069,10 +1111,19 @@ def start_sudden_death_delayed(room_code):
     
     room.sudden_death_started_at = time.time()
 
+    
     socketio.emit('sudden_death_question', {
         'question': room.get_question_data(),
         'scores': room.get_scores(),
     }, to=room_code)
+
+
+    room.question_timeout = threading.Timer(
+        5.0,
+        evaluate_sudden_death_timeout,
+        args=[room_code]
+    )
+    room.question_timeout.start()
 
 def start_sudden_death(room_code):
     """Start a sudden death tie-break question."""
