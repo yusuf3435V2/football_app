@@ -371,7 +371,7 @@ function render() {
     } else if (state.gameState === 'suddenDeathStarting') {
         root.innerHTML = renderSuddenDeathStarting();
     } else if (state.gameState === 'suddenDeath') {
-        root.innerHTML = renderSuddenDeath();
+        root.innerHTML = renderQuiz();
     }
 }
 
