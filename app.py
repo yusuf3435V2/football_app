@@ -961,16 +961,6 @@ def handle_sudden_death_answer(room_code, room, player_id, answer_index):
         'answer_time': answer_time,
     }
 
-    socketio.emit('answer_result', {
-        'results': {
-            player_id: {
-                'is_correct': is_correct,
-                'selected': answer_index,
-                'correct': question['correct'],
-            }
-        }
-    }, to=player_id)
-
     decide_sudden_death(room_code)
 
 def schedule_question_timeout(room_code):
@@ -1067,6 +1057,22 @@ def decide_sudden_death(room_code):
 
     if len(room.sudden_death_answers) < len(room.players):
         return
+    
+    question = room.selected_questions[room.current_question_index]
+
+    results = {}
+
+    for player_id, answer_data in room.sudden_death_answers.items():
+        results[player_id] = {
+            'is_correct': answer_data['is_correct'],
+            'selected': answer_data['selected'],
+            'correct': question['correct'],
+            'timed_out': answer_data.get('timed_out', False),
+        }
+
+    socketio.emit('answer_result', {
+        'results': results
+    }, to=room_code)
 
     if room.question_timeout:
         room.question_timeout.cancel()
