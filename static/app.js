@@ -31,7 +31,9 @@ const state = {
     isPlayerReady: false,
     isHost: false,
     rematchPlayers: [],
-    rematchRequested: false
+    rematchRequested: false,
+    isSuddenDeath: false,
+    suddenDeathMessage: ''
 };
 
 // Socket event listeners
@@ -197,6 +199,32 @@ socket.on('rematch_ready', (data) => {
     render();
 });
 
+socket.on('sudden_death_starting', (data) => {
+    if (timerInterval) clearInterval(timerInterval);
+
+    state.gameState = 'suddenDeathStarting';
+    state.isSuddenDeath = true;
+    state.suddenDeathMessage = data.message;
+    state.answered = false;
+    state.answerResult = null;
+    state.screenFlash = '';
+
+    render();
+});
+
+socket.on('sudden_death_question', (data) => {
+    state.gameState = 'suddenDeath';
+    state.currentQuestion = data.question;
+    state.scores = data.scores || {};
+    state.timeLeft = 5;
+    state.answered = false;
+    state.answerResult = null;
+    state.screenFlash = '';
+
+    startTimer();
+    render();
+});
+
 // Timer management
 let timerInterval = null;
 
@@ -340,6 +368,10 @@ function render() {
         root.innerHTML = renderQuiz();
     } else if (state.gameState === 'results') {
         root.innerHTML = renderResults();
+    } else if (state.gameState === 'suddenDeathStarting') {
+        root.innerHTML = renderSuddenDeathStarting();
+    } else if (state.gameState === 'suddenDeath') {
+        root.innerHTML = renderSuddenDeath();
     }
 }
 
@@ -446,6 +478,26 @@ function renderStarting() {
     `;
 }
 
+function renderSuddenDeathStarting() {
+    return `
+        <div class="app">
+            <div class="starting-container sudden-death-container">
+                <h1>⚡ SUDDEN DEATH ⚡</h1>
+
+                <p class="starting-text">
+                    ${state.suddenDeathMessage || 'Fastest correct answer wins!'}
+                </p>
+
+                <p class="info">
+                    The match is tied. One final question will decide the winner.
+                </p>
+
+                <div class="countdown">⏱️</div>
+            </div>
+        </div>
+    `;
+}
+
 function renderQuiz() {
     if (!state.currentQuestion) {
         return `
@@ -462,7 +514,9 @@ function renderQuiz() {
             <div class="quiz-container">
                 <div class="quiz-header">
                     <div class="question-counter">
-                        ⚽ Question ${state.questionNumber}/${state.totalQuestions}
+                        ${state.gameState === 'suddenDeath'
+                            ? '⚡ Sudden Death - Fastest correct answer wins!'
+                            : `⚽ Question ${state.questionNumber}/${state.totalQuestions}`}
                     </div>
 
                     <div class="timer">
@@ -517,8 +571,44 @@ function renderResults() {
                 <h1>🏁 FULL TIME 🏁</h1>
 
                 <div class="winner-section">
-                    <h2 class="winner-text">🏆 ${state.winner.name} WINS! 🏆</h2>
-                    <p class="winner-score">Final Score: ${state.winner.score} / 10 Questions</p>
+                    ${state.winner.sudden_death_times ? `
+                        <div class="sudden-death-results">
+                            <h3>⚡ Sudden Death Results ⚡</h3>
+
+                            ${state.winner.sudden_death_times.map(player => `
+                                <div class="sudden-death-player">
+                                    <span>
+                                        ${player.is_correct ? '✅' : '❌'}
+                                        ${player.name}
+                                    </span>
+
+                                    <span>
+                                        ${player.answer_time !== null
+                                            ? `${player.answer_time.toFixed(2)}s`
+                                            : '--'}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    <h2 class="winner-text">
+                        ${state.winner.sudden_death_draw
+                            ? '⚡ SUDDEN DEATH DRAW ⚡'
+                            : state.winner.won_by_sudden_death
+                                ? `⚡ ${state.winner.name} WINS BY SUDDEN DEATH! ⚡`
+                                : state.winner.name === 'Draw'
+                                    ? '🤝 DRAW! 🤝'
+                                    : `🏆 ${state.winner.name} WINS! 🏆`}
+                    </h2>
+
+                    <p class="winner-score">
+                        ${state.winner.sudden_death_draw
+                            ? 'Both players missed the sudden death question.'
+                            : state.winner.won_by_sudden_death
+                                ? 'Fastest correct answer decided the match.'
+                                : `Final Score: ${state.winner.score} / 10 Questions`}
+                    </p>
                 </div>
 
                 <div class="final-scores">

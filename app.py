@@ -502,7 +502,6 @@ QUESTIONS = [
     {'id': 195, 'question': 'Which player has won the most Ligue 1 Top Goalscorer awards?', 'options': [
         'Jean-Pierre Papin', 'Kylian Mbappe', 'Delio Onnis', 'Carlos Bianchi'], 'correct': 1},
 
-    
 ]
 
 
@@ -522,6 +521,9 @@ class GameRoom:
         self.is_evaluating = False
         self.host_id = None
         self.rematch_votes = {}
+        self.is_sudden_death = False
+        self.sudden_death_answers = {}
+        self.sudden_death_started_at = None
 
     def add_player(self, player_id, player_name):
         """Add a player if the room is not full and the game has not started."""
@@ -560,6 +562,10 @@ class GameRoom:
         self.game_ended = False
         self.is_evaluating = False
         self.rematch_votes = {}
+        self.is_sudden_death = False
+        self.sudden_death_answers = {}
+        self.sudden_death_started_at = None
+
         for player in self.players.values():
             player['score'] = 0
             player['current_answer'] = None
@@ -822,6 +828,151 @@ def start_game(room_code):
     schedule_question_timeout(room_code)
 
 
+def get_sudden_death_times(room):
+    """Return readable sudden death answer times for the final screen."""
+    times = []
+
+    for player_id, answer_data in room.sudden_death_answers.items():
+        player = room.players.get(player_id)
+
+        if not player:
+            continue
+
+        answer_time = answer_data.get('answer_time')
+
+        times.append({
+            'name': player['name'],
+            'is_correct': answer_data.get('is_correct', False),
+            'answer_time': round(answer_time, 2) if answer_time is not None else None,
+        })
+
+    return sorted(
+        times,
+        key=lambda item: item['answer_time'] if item['answer_time'] is not None else 999
+    )
+
+def end_sudden_death(room_code, winner_id):
+    """End sudden death and declare the fastest correct player as winner."""
+    room = rooms.get(room_code)
+
+    if not room or room.game_ended:
+        return
+
+    room.game_ended = True
+    room.is_sudden_death = False
+
+    winner = room.players[winner_id]
+
+    final_scores = {
+        player['name']: player['score']
+        for player in room.players.values()
+    }
+
+    socketio.emit('game_ended', {
+        'final_scores': final_scores,
+        'winner': {
+            'name': winner['name'],
+            'score': winner['score'],
+            'won_by_sudden_death': True,
+            'sudden_death_times': get_sudden_death_times(room),
+        },
+    }, to=room_code)
+
+
+def end_sudden_death_draw(room_code):
+    """End sudden death as a draw."""
+    room = rooms.get(room_code)
+
+    if not room or room.game_ended:
+        return
+
+    room.game_ended = True
+    room.is_sudden_death = False
+
+    final_scores = {
+        player['name']: player['score']
+        for player in room.players.values()
+    }
+
+    socketio.emit('game_ended', {
+        'final_scores': final_scores,
+        'winner': {
+            'name': 'Draw',
+            'score': max(final_scores.values()) if final_scores else 0,
+            'won_by_sudden_death': False,
+            'sudden_death_draw': True,
+            'sudden_death_times': get_sudden_death_times(room),
+        },
+    }, to=room_code)
+
+def handle_sudden_death_answer(room_code, room, player_id, answer_index):
+    """Handle sudden death answers where fastest correct answer wins."""
+    if player_id in room.sudden_death_answers:
+        return
+
+    question = room.selected_questions[room.current_question_index]
+    is_correct = answer_index == question['correct']
+
+    answered_at = time.time()
+
+
+    answer_time = (
+        answered_at - room.sudden_death_started_at
+        if room.sudden_death_started_at
+        else None
+    )
+
+    room.sudden_death_answers[player_id] = {
+        'selected': answer_index,
+        'is_correct': is_correct,
+        'answered_at': answered_at,
+        'answer_time': answer_time,
+    }
+
+    socketio.emit('answer_result', {
+        'results': {
+            player_id: {
+                'is_correct': is_correct,
+                'selected': answer_index,
+                'correct': question['correct'],
+            }
+        }
+    }, to=player_id)
+
+    # Wait until both players have answered before deciding sudden death.
+    if len(room.sudden_death_answers) < len(room.players):
+        return
+
+    correct_answers = [
+        {
+            'player_id': answer_player_id,
+            'answered_at': answer_data['answered_at'],
+        }
+        for answer_player_id, answer_data in room.sudden_death_answers.items()
+        if answer_data['is_correct']
+    ]
+
+    # Both players got it wrong.
+    if len(correct_answers) == 0:
+        end_sudden_death_draw(room_code)
+        return
+
+    # Only one player got it correct.
+    if len(correct_answers) == 1:
+        end_sudden_death(room_code, winner_id=correct_answers[0]['player_id'])
+        return
+
+    # Both players got it correct. Fastest wins.
+    correct_answers.sort(key=lambda answer: answer['answered_at'])
+
+    first_answer = correct_answers[0]
+    second_answer = correct_answers[1]
+
+    if first_answer['answered_at'] == second_answer['answered_at']:
+        end_sudden_death_draw(room_code)
+    else:
+        end_sudden_death(room_code, winner_id=first_answer['player_id'])
+
 def schedule_question_timeout(room_code):
     """Schedule automatic question evaluation after 5 seconds."""
     room = rooms.get(room_code)
@@ -843,6 +994,10 @@ def handle_submit_answer(data):
     room_code, room = get_room_for_player(sid)
 
     if not room or not room.game_started or room.game_ended:
+        return
+    
+    if room.is_sudden_death:
+        handle_sudden_death_answer(room_code, room, sid, answer_index)
         return
 
     room.submit_answer(sid, answer_index)
@@ -897,6 +1052,49 @@ def evaluate_after_short_delay(room_code):
     evaluate_and_next_question(room_code)
 
 
+def is_game_tied(room):
+    """Return True when both players have the same score."""
+    scores = [player['score'] for player in room.players.values()]
+    return len(scores) == 2 and scores[0] == scores[1]
+
+
+def start_sudden_death_delayed(room_code):
+    """Wait briefly before showing the sudden death question."""
+    time.sleep(3)
+
+    room = rooms.get(room_code)
+
+    if not room or room.game_ended:
+        return
+    
+    room.sudden_death_started_at = time.time()
+
+    socketio.emit('sudden_death_question', {
+        'question': room.get_question_data(),
+        'scores': room.get_scores(),
+    }, to=room_code)
+
+def start_sudden_death(room_code):
+    """Start a sudden death tie-break question."""
+    room = rooms.get(room_code)
+
+    if not room or room.game_ended:
+        return
+
+    room.is_sudden_death = True
+    room.sudden_death_answers = {}
+    room.current_question_index = 0
+    room.selected_questions = random.sample(QUESTIONS, 1)
+
+    for player in room.players.values():
+        player['current_answer'] = None
+
+    socketio.emit('sudden_death_starting', {
+        'message': 'Sudden death! Fastest correct answer wins!'
+    }, to=room_code)
+
+    socketio.start_background_task(start_sudden_death_delayed, room_code)
+
 def evaluate_and_next_question(room_code):
     """Evaluate current answers, then either send next question or end the game."""
     room = rooms.get(room_code)
@@ -927,7 +1125,10 @@ def evaluate_and_next_question(room_code):
         }, to=room_code)
         schedule_question_timeout(room_code)
     else:
-        end_game(room_code)
+        if is_game_tied(room):
+            start_sudden_death(room_code)
+        else:
+            end_game(room_code)
 
 
 def end_game(room_code):
