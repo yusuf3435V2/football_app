@@ -380,11 +380,7 @@ function renderMenu() {
         <div class="app">
             <div class="menu-container">
                 <div class="brand-lockup">
-                    <div class="brand-mark">M</div>
-                    <div>
-                        <h1>MATCH<span>UP</span></h1>
-                        <p class="brand-tagline">Football knowledge. Head to head.</p>
-                    </div>
+                    <img src="/static/matchup_logo.svg" class="main-logo" alt="MatchUp logo">
                 </div>
 
                 <div class="menu-options">

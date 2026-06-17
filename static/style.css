@@ -204,27 +204,22 @@ body::after {
 
 .menu-options {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 26px;
-    align-items: stretch;
+    grid-template-columns: 1fr;
+    gap: 24px;
 }
 
 .menu-section {
-    background: rgba(255,255,255,0.055);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 20px;
-    padding: 24px;
-    backdrop-filter: blur(10px);
+    background: #151515;
+    border: 1px solid #3a3a3a;
+    border-radius: 22px;
+    padding: 34px;
 }
 
+
 .menu-section h2 {
-    color: var(--white);
-    font-size: 20px;
-    text-align: center;
-    margin-bottom: 18px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    color: #ffffff;
 }
+
 
 .menu-section form {
     display: flex;
@@ -233,13 +228,8 @@ body::after {
 }
 
 .menu-section input {
-    padding: 14px 16px;
-    border-radius: 12px;
-    font-size: 16px;
-    border: 2px solid rgba(255,255,255,0.14);
-    background: rgba(255,255,255,0.95);
-    color: var(--black);
-    transition: all 0.2s ease;
+    background: #f5f5f5;
+    color: #0a0a0a;
 }
 
 .menu-section input:focus {
@@ -249,11 +239,9 @@ body::after {
 }
 
 .divider {
-    align-self: center;
-    color: var(--yellow);
-    font-weight: 950;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    color: #facc15;
+    font-size: 20px;
+    font-weight: 900;
 }
 
 /* Buttons */
@@ -410,6 +398,12 @@ body::after {
     animation: spin 1s linear infinite;
 }
 
+.brand-lockup {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 35px;
+}
+
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -453,6 +447,12 @@ body::after {
     font-size: 78px;
     animation: pulse 1s infinite;
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.18));
+}
+
+
+.main-logo {
+    width: 420px;
+    max-width: 100%;
 }
 
 @keyframes pulse {
