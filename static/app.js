@@ -379,22 +379,28 @@ function renderMenu() {
     return `
         <div class="app">
             <div class="menu-container">
-                <h1>⚽ FOOTBALL QUIZ ⚽</h1>
+                <div class="brand-lockup">
+                    <div class="brand-mark">M</div>
+                    <div>
+                        <h1>MATCH<span>UP</span></h1>
+                        <p class="brand-tagline">Football knowledge. Head to head.</p>
+                    </div>
+                </div>
 
                 <div class="menu-options">
                     <div class="menu-section">
-                        <h2>🏟️ Create Room</h2>
+                        <h2>Create Match</h2>
                         <form onsubmit="handleCreateRoom(event)">
                             <input type="text" id="roomCode" placeholder="Enter room code" maxlength="20" required />
                             <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" required />
-                            <button type="submit" class="btn btn-primary">Create & Host</button>
+                            <button type="submit" class="btn btn-primary">Create Match</button>
                         </form>
                     </div>
 
                     <div class="divider">OR</div>
 
                     <div class="menu-section">
-                        <h2>👥 Join Room</h2>
+                        <h2>Join Match</h2>
                         <form onsubmit="handleJoinRoom(event)">
                             <input type="text" id="joinRoomCode" placeholder="Enter room code" maxlength="20" required />
                             <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20" required />
@@ -413,12 +419,12 @@ function renderWaiting() {
     return `
         <div class="app">
             <div class="waiting-container">
-                <h1>🎯 MATCH ROOM: ${state.roomCode}</h1>
+                <h1><span class="brand-mini">M</span> MATCH ROOM: ${state.roomCode}</h1>
 
                 <p class="info">
                     ${bothPlayersJoined
-                        ? '⚽ Both teams ready! Click your status button to start the challenge.'
-                        : '⏳ Waiting for your opponent to join...'}
+                        ? 'Both players are in. Ready up to start the MatchUp.'
+                        : 'Waiting for your opponent to join...'}
                 </p>
 
                 <div class="players-list">
@@ -440,7 +446,7 @@ function renderWaiting() {
                         onclick="handleReadyClick()"
                         ${state.isPlayerReady ? 'disabled' : ''}
                     >
-                        ${state.isPlayerReady ? '✅ YOU ARE READY!' : '🎮 Ready Up to Play'}
+                        ${state.isPlayerReady ? 'READY' : 'Ready Up'}
                     </button>
                 ${state.isHost ? `
                     <button
@@ -452,7 +458,7 @@ function renderWaiting() {
                 ` : ''}
                 ` : `
                     <div class="spinner"></div>
-                    <p class="info">📱 Share this code with your friend: <strong style="font-size: 18px; color: #ff6b35;">${state.roomCode}</strong></p>
+                    <p class="info">Share this room code: <strong style="font-size: 18px; color: #ff6b35;">${state.roomCode}</strong></p>
                 `}
             </div>
         </div>
@@ -463,7 +469,7 @@ function renderStarting() {
     return `
         <div class="app">
             <div class="starting-container">
-                <h1>⚽ KICKOFF! ⚽</h1>
+                <h1><span class="brand-mini">M</span> MATCH<span>UP</span></h1>
 
                 <div class="starting-players">
                     ${state.players.map(player => `
@@ -471,7 +477,7 @@ function renderStarting() {
                     `).join('')}
                 </div>
 
-                <p class="starting-text">🏁 Get Ready to Test Your Knowledge!</p>
+                <p class="starting-text">Football knowledge. Head to head.</p>
                 <div class="countdown">🎮</div>
             </div>
         </div>
@@ -482,14 +488,14 @@ function renderSuddenDeathStarting() {
     return `
         <div class="app">
             <div class="starting-container sudden-death-container">
-                <h1>⚡ SUDDEN DEATH ⚡</h1>
+                <h1>GOLDEN GOAL</h1>
 
                 <p class="starting-text">
                     ${state.suddenDeathMessage || 'Fastest correct answer wins!'}
                 </p>
 
                 <p class="info">
-                    The match is tied. One final question will decide the winner.
+                    The match is tied. One final question decides it.
                 </p>
 
                 <div class="countdown">⏱️</div>
@@ -515,7 +521,7 @@ function renderQuiz() {
                 <div class="quiz-header">
                     <div class="question-counter">
                         ${state.gameState === 'suddenDeath'
-                            ? '⚡ Sudden Death - Fastest correct answer wins!'
+                            ? 'GOLDEN GOAL · FASTEST CORRECT ANSWER WINS'
                             : `⚽ Question ${state.questionNumber}/${state.totalQuestions}`}
                     </div>
 
@@ -568,12 +574,12 @@ function renderResults() {
     return `
         <div class="app">
             <div class="results-container">
-                <h1>🏁 FULL TIME 🏁</h1>
+                <h1><span class="brand-mini">M</span> FULL TIME</h1>
 
                 <div class="winner-section">
                     ${state.winner.sudden_death_times ? `
                         <div class="sudden-death-results">
-                            <h3>⚡ Sudden Death Results ⚡</h3>
+                            <h3>Golden Goal Results</h3>
 
                             ${state.winner.sudden_death_times.map(player => `
                                 <div class="sudden-death-player">
@@ -596,9 +602,9 @@ function renderResults() {
 
                     <h2 class="winner-text">
                         ${state.winner.sudden_death_draw
-                            ? '⚡ SUDDEN DEATH DRAW ⚡'
+                            ? 'GOLDEN GOAL DRAW'
                             : state.winner.won_by_sudden_death
-                                ? `⚡ ${state.winner.name} WINS BY SUDDEN DEATH! ⚡`
+                                ? `${state.winner.name} WINS BY GOLDEN GOAL!`
                                 : state.winner.name === 'Draw'
                                     ? '🤝 DRAW! 🤝'
                                     : `🏆 ${state.winner.name} WINS! 🏆`}
@@ -606,7 +612,7 @@ function renderResults() {
 
                     <p class="winner-score">
                         ${state.winner.sudden_death_draw
-                            ? 'Both players missed the sudden death question.'
+                            ? 'Both players missed the Golden Goal question.'
                             : state.winner.won_by_sudden_death
                                 ? 'Fastest correct answer decided the match.'
                                 : `Final Score: ${state.winner.score} / 10 Questions`}
