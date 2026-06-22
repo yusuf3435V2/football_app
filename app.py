@@ -12,6 +12,7 @@ socketio = SocketIO(
 )
 
 rooms = {}
+waiting_queue = []
 
 # Answers stay on the backend only. The frontend only receives id/question/options.
 GAME_QUESTION_COUNT = 10
@@ -712,6 +713,62 @@ def handle_disconnect():
     print(f'Client disconnected: {sid}')
 
 
+def generate_room_code():
+    """Generate a unique automatic room code for matchmaking."""
+    while True:
+        room_code = f"MATCH-{random.randint(1000, 9999)}"
+
+        if room_code not in rooms:
+            return room_code
+
+@socketio.on('search_match')
+def handle_search_match(data):
+    """Put player in queue or match them with another waiting player."""
+    player_name = data.get('player_name', '').strip()
+    sid = request.sid
+
+    if not player_name:
+        emit('error', {'message': 'Please enter your name.'})
+        return
+
+    # If someone is already waiting, match with them.
+    if waiting_queue:
+        opponent = waiting_queue.pop(0)
+
+        room_code = generate_room_code()
+        room = GameRoom(room_code)
+        rooms[room_code] = room
+
+        # Add both players to the room.
+        room.add_player(opponent['sid'], opponent['player_name'])
+        room.add_player(sid, player_name)
+
+        join_room(room_code, sid=opponent['sid'])
+        join_room(room_code, sid=sid)
+
+        socketio.emit('match_found', {
+            'room_code': room_code,
+            'players': room.get_player_statuses(),
+            'is_host': True,
+        }, to=opponent['sid'])
+
+        socketio.emit('match_found', {
+            'room_code': room_code,
+            'players': room.get_player_statuses(),
+            'is_host': False,
+        }, to=sid)
+
+    else:
+        # Nobody waiting, so add this player to queue.
+        waiting_queue.append({
+            'sid': sid,
+            'player_name': player_name,
+        })
+
+        emit('searching_for_match', {
+            'message': 'Searching for opponent...'
+        })
+
 @socketio.on('create_room')
 def handle_create_room(data):
     """Create a new game room."""
@@ -740,6 +797,20 @@ def handle_create_room(data):
     })
 
     print(f'Room created: {room_code} by {player_name}')
+
+
+@socketio.on('cancel_search')
+def handle_cancel_search():
+    """Remove player from matchmaking queue."""
+    sid = request.sid
+
+    global waiting_queue
+    waiting_queue = [
+        player for player in waiting_queue
+        if player['sid'] != sid
+    ]
+
+    emit('search_cancelled')
 
 @socketio.on('join_room')
 def handle_join_room(data):

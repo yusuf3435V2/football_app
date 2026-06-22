@@ -33,7 +33,8 @@ const state = {
     rematchPlayers: [],
     rematchRequested: false,
     isSuddenDeath: false,
-    suddenDeathMessage: ''
+    suddenDeathMessage: '',
+    isSearching: false
 };
 
 // Socket event listeners
@@ -138,6 +139,11 @@ socket.on('room_updated', (data) => {
     render();
 });
 
+socket.on('search_cancelled', () => {
+    state.isSearching = false;
+    render();
+});
+
 socket.on('answer_result', (data) => {
     const myResult = data.results[socket.id];
 
@@ -224,6 +230,23 @@ socket.on('sudden_death_question', (data) => {
     startTimer();
     render();
 });
+
+socket.on('searching_for_match', (data) => {
+    state.isSearching = true;
+    render();
+});
+
+socket.on('match_found', (data) => {
+    state.roomCode = data.room_code;
+    state.players = data.players;
+    state.isHost = data.is_host;
+    state.gameState = 'waiting';
+    state.isPlayerReady = false;
+    state.isSearching = false;
+
+    render();
+});
+
 
 // Timer management
 let timerInterval = null;
@@ -330,6 +353,30 @@ function handleRematchClick() {
     }
 }
 
+function handleSearchMatch(e) {
+    e.preventDefault();
+
+    const playerName = document.getElementById('searchPlayerName').value.trim();
+
+    if (!playerName) {
+        alert('Please enter your name.');
+        return;
+    }
+
+    state.playerName = playerName;
+    state.isSearching = true;
+
+    socket.emit('search_match', {
+        player_name: playerName
+    });
+
+    render();
+}
+
+function handleCancelSearch() {
+    socket.emit('cancel_search');
+}
+
 function resetToMenu() {
 
     if (timerInterval) clearInterval(timerInterval);
@@ -385,24 +432,65 @@ function renderMenu() {
                     <p class="brand-tagline">Football knowledge. Head to head.</p>
                 </div>
 
+                <div class="quick-match-card">
+                    <h2>Quick Match</h2>
+                    <p class="info">Search online and play against another player instantly.</p>
+
+                    <form onsubmit="handleSearchMatch(event)">
+                        <input
+                            type="text"
+                            id="searchPlayerName"
+                            placeholder="Enter your name"
+                            maxlength="20"
+                            required
+                            ${state.isSearching ? 'disabled' : ''}
+                        />
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            ${state.isSearching ? 'disabled' : ''}
+                        >
+                            ${state.isSearching ? 'Searching...' : 'Search for Match'}
+                        </button>
+                    </form>
+
+                    ${state.isSearching ? `
+                        <div class="searching-box">
+                            <div class="spinner"></div>
+                            <p>Looking for an opponent...</p>
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                onclick="handleCancelSearch()"
+                            >
+                                Cancel Search
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="private-match-title">
+                    Private Match
+                </div>
+
                 <div class="menu-options">
                     <div class="menu-section">
-                        <h2>Create Match</h2>
+                        <h2>Create Room</h2>
                         <form onsubmit="handleCreateRoom(event)">
                             <input type="text" id="roomCode" placeholder="Enter room code" maxlength="20" required />
                             <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" required />
-                            <button type="submit" class="btn btn-primary">Create Match</button>
+                            <button type="submit" class="btn btn-secondary">Create Private Room</button>
                         </form>
                     </div>
 
-                    <div class="divider">OR</div>
-
                     <div class="menu-section">
-                        <h2>Join Match</h2>
+                        <h2>Join Room</h2>
                         <form onsubmit="handleJoinRoom(event)">
                             <input type="text" id="joinRoomCode" placeholder="Enter room code" maxlength="20" required />
                             <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20" required />
-                            <button type="submit" class="btn btn-primary">Join Match</button>
+                            <button type="submit" class="btn btn-secondary">Join Private Room</button>
                         </form>
                     </div>
                 </div>
@@ -467,7 +555,7 @@ function renderStarting() {
     return `
         <div class="app">
             <div class="starting-container">
-                <h1><span class="brand-mini">M</span> MATCH<span>UP</span></h1>
+                <h1><span class="brand-mini"></span> MATCH<span>UP</span></h1>
 
                 <div class="starting-players">
                     ${state.players.map(player => `
