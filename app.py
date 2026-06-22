@@ -698,6 +698,13 @@ def handle_disconnect():
     sid = request.sid
     room_code, room = get_room_for_player(sid)
 
+    global waiting_queue
+    
+    waiting_queue = [
+        player for player in waiting_queue
+        if player['sid'] != request.sid
+    ]
+
     if room:
         room.remove_player(sid)
         socketio.emit('player_left', {
