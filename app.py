@@ -699,7 +699,7 @@ def handle_disconnect():
     room_code, room = get_room_for_player(sid)
 
     global waiting_queue
-    
+
     waiting_queue = [
         player for player in waiting_queue
         if player['sid'] != request.sid
@@ -808,13 +808,11 @@ def handle_create_room(data):
 
 @socketio.on('cancel_search')
 def handle_cancel_search():
-    """Remove player from matchmaking queue."""
-    sid = request.sid
-
     global waiting_queue
+
     waiting_queue = [
         player for player in waiting_queue
-        if player['sid'] != sid
+        if player['sid'] != request.sid
     ]
 
     emit('search_cancelled')

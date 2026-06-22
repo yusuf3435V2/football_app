@@ -141,6 +141,7 @@ socket.on('room_updated', (data) => {
 
 socket.on('search_cancelled', () => {
     state.isSearching = false;
+    state.gameState = 'menu';
     render();
 });
 
@@ -233,6 +234,7 @@ socket.on('sudden_death_question', (data) => {
 
 socket.on('searching_for_match', (data) => {
     state.isSearching = true;
+    state.gameState = 'searching';
     render();
 });
 
@@ -365,6 +367,7 @@ function handleSearchMatch(e) {
 
     state.playerName = playerName;
     state.isSearching = true;
+    state.gameState = 'searching';
 
     socket.emit('search_match', {
         player_name: playerName
@@ -374,7 +377,10 @@ function handleSearchMatch(e) {
 }
 
 function handleCancelSearch() {
+    state.isSearching = false;
+    state.gameState = 'menu';
     socket.emit('cancel_search');
+    render();
 }
 
 function resetToMenu() {
@@ -407,6 +413,8 @@ function render() {
 
     if (state.gameState === 'menu') {
         root.innerHTML = renderMenu();
+    } else if (state.gameState === 'searching') {
+    root.innerHTML = renderSearching();
     } else if (state.gameState === 'waiting') {
         root.innerHTML = renderWaiting();
     } else if (state.gameState === 'starting') {
@@ -455,20 +463,6 @@ function renderMenu() {
                         </button>
                     </form>
 
-                    ${state.isSearching ? `
-                        <div class="searching-box">
-                            <div class="spinner"></div>
-                            <p>Looking for an opponent...</p>
-
-                            <button
-                                type="button"
-                                class="btn btn-secondary"
-                                onclick="handleCancelSearch()"
-                            >
-                                Cancel Search
-                            </button>
-                        </div>
-                    ` : ''}
                 </div>
 
                 <div class="private-match-title">
@@ -546,6 +540,34 @@ function renderWaiting() {
                     <div class="spinner"></div>
                     <p class="info">Share this room code: <strong style="font-size: 18px; color: #ff6b35;">${state.roomCode}</strong></p>
                 `}
+            </div>
+        </div>
+    `;
+}
+
+function renderSearching() {
+    return `
+        <div class="app">
+            <div class="waiting-container">
+                <div class="brand-lockup">
+                    <img src="/static/matchup-logo.png" class="main-logo" alt="MatchUp logo">
+                </div>
+
+                <h1 class="screen-title">Searching...</h1>
+
+                <p class="info">
+                    Looking for an opponent for <strong>${state.playerName}</strong>
+                </p>
+
+                <div class="spinner"></div>
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="handleCancelSearch()"
+                >
+                    Cancel Search
+                </button>
             </div>
         </div>
     `;
