@@ -1389,11 +1389,13 @@ def register():
             }
         })
 
-    except Exception:
+    except Exception as e:
+        print("REGISTER ERROR:", e)
+
         return jsonify({
             'success': False,
-            'message': 'Email or username already exists.'
-        }), 409
+            'message': str(e)
+        }), 500
 
 
 @app.route('/api/login', methods=['POST'])
