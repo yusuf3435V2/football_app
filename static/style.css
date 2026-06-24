@@ -825,11 +825,14 @@ body::after {
 }
 
 .auth-bar {
+    position: fixed;
+    top: 24px;
+    right: 28px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 12px;
-    margin-bottom: 18px;
+    z-index: 1000;
 }
 
 .auth-user {

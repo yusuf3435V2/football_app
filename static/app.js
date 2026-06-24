@@ -565,6 +565,7 @@ function render() {
 function renderMenu() {
     return `
         <div class="app">
+            ${renderAuthBar()}
             <div class="menu-container">
                 <div class="brand-lockup">
                     <img src="/static/matchup-logo.png" class="main-logo" alt="MatchUp logo">
