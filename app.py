@@ -3,13 +3,22 @@ from flask_socketio import SocketIO, emit, join_room
 import random
 import threading
 import time
+import os
+import psycopg2
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import jsonify, session
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'quiz-secret-key-2026'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 socketio = SocketIO(
     app,
     cors_allowed_origins="*"
 )
+
+
+def get_db_connection():
+    return psycopg2.connect(os.environ['DATABASE_URL'])
 
 rooms = {}
 waiting_queue = []
@@ -1330,6 +1339,143 @@ def close_room():
             del rooms[room_code]
 
             break
+
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+
+    email = data.get('email', '').strip().lower()
+    username = data.get('username', '').strip()
+    password = data.get('password', '')
+
+    if not email or not username or not password:
+        return jsonify({'success': False, 'message': 'All fields are required.'}), 400
+
+    if len(password) < 8:
+        return jsonify({'success': False, 'message': 'Password must be at least 8 characters.'}), 400
+
+    password_hash = generate_password_hash(password)
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute(
+            """
+            INSERT INTO users (email, username, password_hash)
+            VALUES (%s, %s, %s)
+            RETURNING id, email, username
+            """,
+            (email, username, password_hash)
+        )
+
+        user = cur.fetchone()
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        session['user_id'] = user[0]
+        session['username'] = user[2]
+
+        return jsonify({
+            'success': True,
+            'message': 'Account created successfully.',
+            'user': {
+                'id': user[0],
+                'email': user[1],
+                'username': user[2]
+            }
+        })
+
+    except Exception:
+        return jsonify({
+            'success': False,
+            'message': 'Email or username already exists.'
+        }), 409
+
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+
+    if not email or not password:
+        return jsonify({
+            'success': False,
+            'message': 'Email and password are required.'
+        }), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT id, email, username, password_hash
+        FROM users
+        WHERE email = %s
+        """,
+        (email,)
+    )
+
+    user = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not user:
+        return jsonify({
+            'success': False,
+            'message': 'Invalid email or password.'
+        }), 401
+
+    if not check_password_hash(user[3], password):
+        return jsonify({
+            'success': False,
+            'message': 'Invalid email or password.'
+        }), 401
+
+    session['user_id'] = user[0]
+    session['username'] = user[2]
+
+    return jsonify({
+        'success': True,
+        'user': {
+            'id': user[0],
+            'email': user[1],
+            'username': user[2]
+        }
+    })
+
+
+@app.route('/api/me', methods=['GET'])
+def get_current_user():
+    if 'user_id' not in session:
+        return jsonify({
+            'logged_in': False,
+            'user': None
+        })
+
+    return jsonify({
+        'logged_in': True,
+        'user': {
+            'id': session['user_id'],
+            'username': session['username']
+        }
+    })
+
+
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    session.clear()
+
+    return jsonify({
+        'success': True,
+        'message': 'Logged out successfully.'
+    })
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)

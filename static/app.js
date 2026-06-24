@@ -34,8 +34,30 @@ const state = {
     rematchRequested: false,
     isSuddenDeath: false,
     suddenDeathMessage: '',
-    isSearching: false
+    isSearching: false,
+    authUser: null,
+    authMode: 'login',
+    showAuthModal: false,
 };
+
+async function checkAuthStatus() {
+    try {
+        const response = await fetch('/api/me');
+
+        const data = await response.json();
+
+        if (data.logged_in) {
+            state.authUser = data.user;
+        } else {
+            state.authUser = null;
+        }
+
+        render();
+
+    } catch (error) {
+        console.error('Failed to check auth status:', error);
+    }
+}
 
 // Socket event listeners
 socket.on('error', (data) => {
@@ -276,7 +298,9 @@ function handleCreateRoom(e) {
     e.preventDefault();
 
     const roomCode = document.getElementById('roomCode').value.trim();
-    const playerName = document.getElementById('playerName').value.trim();
+    const playerName = state.authUser
+    ? state.authUser.username
+    : document.getElementById('playerName').value.trim();
 
     if (roomCode && playerName) {
         state.roomCode = roomCode.toUpperCase();
@@ -292,7 +316,9 @@ function handleJoinRoom(e) {
     e.preventDefault();
 
     const roomCode = document.getElementById('joinRoomCode').value.trim();
-    const playerName = document.getElementById('joinPlayerName').value.trim();
+    const playerName = state.authUser
+    ? state.authUser.username
+    : document.getElementById('joinPlayerName').value.trim();
 
     if (roomCode && playerName) {
         state.roomCode = roomCode.toUpperCase();
@@ -355,10 +381,23 @@ function handleRematchClick() {
     }
 }
 
+function openAuthModal(mode) {
+    state.authMode = mode;
+    state.showAuthModal = true;
+    render();
+}
+
+function closeAuthModal() {
+    state.showAuthModal = false;
+    render();
+}
+
 function handleSearchMatch(e) {
     e.preventDefault();
 
-    const playerName = document.getElementById('searchPlayerName').value.trim();
+    const playerName = state.authUser
+    ? state.authUser.username
+    : document.getElementById('searchPlayerName').value.trim();
 
     if (!playerName) {
         alert('Please enter your name.');
@@ -381,6 +420,99 @@ function handleCancelSearch() {
     state.gameState = 'menu';
     socket.emit('cancel_search');
     render();
+}
+
+async function handleRegister(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('authUsername').value.trim();
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username,
+                email,
+                password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert(data.message);
+            return;
+        }
+
+        state.authUser = data.user;
+        state.playerName = data.user.username;
+        state.showAuthModal = false;
+
+        render();
+
+    } catch (error) {
+        alert('Something went wrong while creating your account.');
+    }
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email,
+                password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert(data.message);
+            return;
+        }
+
+        state.authUser = data.user;
+        state.playerName = data.user.username;
+        state.showAuthModal = false;
+
+        render();
+
+    } catch (error) {
+        alert('Something went wrong while logging in.');
+    }
+}
+
+async function handleLogout() {
+    try {
+        await fetch('/api/logout', {
+            method: 'POST'
+        });
+
+        state.authUser = null;
+        state.playerName = '';
+        state.showAuthModal = false;
+        state.isSearching = false;
+        state.gameState = 'menu';
+
+        render();
+
+    } catch (error) {
+        alert('Something went wrong while logging out.');
+    }
 }
 
 function resetToMenu() {
@@ -445,14 +577,20 @@ function renderMenu() {
                     <p class="info">Search online and play against another player instantly.</p>
 
                     <form onsubmit="handleSearchMatch(event)">
-                        <input
-                            type="text"
-                            id="searchPlayerName"
-                            placeholder="Enter your name"
-                            maxlength="20"
-                            required
-                            ${state.isSearching ? 'disabled' : ''}
-                        />
+                        ${state.authUser ? `
+                            <div class="account-player-box">
+                                Playing as <strong>${state.authUser.username}</strong>
+                            </div>
+                        ` : `
+                            <input
+                                type="text"
+                                id="searchPlayerName"
+                                placeholder="Enter your name"
+                                maxlength="20"
+                                required
+                                ${state.isSearching ? 'disabled' : ''}
+                            />
+                        `}
 
                         <button
                             type="submit"
@@ -474,7 +612,13 @@ function renderMenu() {
                         <h2>Create Room</h2>
                         <form onsubmit="handleCreateRoom(event)">
                             <input type="text" id="roomCode" placeholder="Enter room code" maxlength="20" required />
-                            <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" required />
+                            ${state.authUser ? `
+                                <div class="account-player-box">
+                                    Playing as <strong>${state.authUser.username}</strong>
+                                </div>
+                            ` : `
+                                <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" required />
+                            `}
                             <button type="submit" class="btn btn-secondary">Create Private Room</button>
                         </form>
                     </div>
@@ -483,12 +627,19 @@ function renderMenu() {
                         <h2>Join Room</h2>
                         <form onsubmit="handleJoinRoom(event)">
                             <input type="text" id="joinRoomCode" placeholder="Enter room code" maxlength="20" required />
-                            <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20" required />
+                            ${state.authUser ? `
+                                <div class="account-player-box">
+                                    Playing as <strong>${state.authUser.username}</strong>
+                                </div>
+                            ` : `
+                                <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20" required />
+                            `}
                             <button type="submit" class="btn btn-secondary">Join Private Room</button>
                         </form>
                     </div>
                 </div>
             </div>
+            ${state.showAuthModal ? renderAuthModal() : ''}
         </div>
     `;
 }
@@ -612,6 +763,62 @@ function renderSuddenDeathStarting() {
     `;
 }
 
+function renderAuthModal() {
+    const isRegister = state.authMode === 'register';
+
+    return `
+        <div class="auth-modal-backdrop">
+            <div class="auth-modal">
+                <button class="auth-close" onclick="closeAuthModal()">×</button>
+
+                <h2>${isRegister ? 'Create Account' : 'Login'}</h2>
+
+                <form onsubmit="${isRegister ? 'handleRegister(event)' : 'handleLogin(event)'}">
+                    ${isRegister ? `
+                        <input
+                            type="text"
+                            id="authUsername"
+                            placeholder="Username"
+                            maxlength="20"
+                            required
+                        />
+                    ` : ''}
+
+                    <input
+                        type="email"
+                        id="authEmail"
+                        placeholder="Email"
+                        required
+                    />
+
+                    <input
+                        type="password"
+                        id="authPassword"
+                        placeholder="Password"
+                        minlength="8"
+                        required
+                    />
+
+                    <button type="submit" class="btn btn-primary">
+                        ${isRegister ? 'Sign Up' : 'Login'}
+                    </button>
+                </form>
+
+                <p class="auth-switch">
+                    ${isRegister
+                        ? 'Already have an account?'
+                        : 'Need an account?'}
+                    <button
+                        onclick="openAuthModal('${isRegister ? 'login' : 'register'}')"
+                    >
+                        ${isRegister ? 'Login' : 'Sign Up'}
+                    </button>
+                </p>
+            </div>
+        </div>
+    `;
+}
+
 function renderQuiz() {
     if (!state.currentQuestion) {
         return `
@@ -678,9 +885,28 @@ function renderQuiz() {
     `;
 }
 
+function renderAuthBar() {
+    if (state.authUser) {
+        return `
+            <div class="auth-bar">
+                <span class="auth-user">👤 ${state.authUser.username}</span>
+                <button class="auth-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="auth-bar">
+            <button class="auth-btn" onclick="openAuthModal('login')">Login</button>
+            <button class="auth-btn auth-btn-primary" onclick="openAuthModal('register')">Sign Up</button>
+        </div>
+    `;
+}
+
 function renderResults() {
     return `
         <div class="app">
+            ${renderAuthBar()}
             <div class="results-container">
                 <h1><span class="brand-mini">M</span> FULL TIME</h1>
 
@@ -776,4 +1002,6 @@ function renderResults() {
 
 
 // Initial render
-render();
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuthStatus();
+});

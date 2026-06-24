@@ -824,6 +824,34 @@ body::after {
     margin-bottom: 12px;
 }
 
+.auth-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.auth-user {
+    color: var(--white);
+    font-weight: 900;
+}
+
+.auth-btn {
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.08);
+    color: var(--white);
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.auth-btn-primary {
+    background: var(--red);
+    border-color: var(--red);
+}
+
 .quick-match-card .info {
     color: var(--grey-light);
     text-align: left;
@@ -872,6 +900,91 @@ body::after {
     color: var(--grey-light);
     font-weight: 800;
     margin-top: 10px;
+}
+
+.auth-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+}
+
+.auth-modal {
+    width: min(420px, 92vw);
+    background: #111;
+    border: 1px solid rgba(220, 38, 38, 0.45);
+    border-radius: 24px;
+    padding: 34px;
+    position: relative;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+}
+
+.auth-modal h2 {
+    color: var(--white);
+    margin-bottom: 22px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 950;
+}
+
+.auth-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.auth-modal input {
+    width: 100%;
+    background: #fff;
+    color: #0a0a0a;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.auth-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.auth-switch {
+    color: var(--grey-light);
+    text-align: center;
+    margin-top: 18px;
+    font-weight: 700;
+}
+
+.auth-switch button {
+    background: none;
+    border: none;
+    color: var(--red);
+    font-weight: 950;
+    cursor: pointer;
+}
+
+.account-player-box {
+    background: rgba(255,255,255,0.08);
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 16px;
+    padding: 18px 20px;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.account-player-box strong {
+    color: var(--yellow);
 }
 
 @keyframes lockedOverlay {
