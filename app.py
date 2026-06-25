@@ -542,6 +542,7 @@ class GameRoom:
             return False
 
         self.players[sid] = {
+            'id': sid,
             'name': name,
             'score': 0,
             'is_ready': False,
