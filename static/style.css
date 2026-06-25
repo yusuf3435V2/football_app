@@ -986,6 +986,50 @@ body::after {
     font-weight: 800;
 }
 
+.auth-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.14);
+    padding: 8px 12px;
+    border-radius: 999px;
+}
+
+.rank-badge {
+    color: #0a0a0a;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+    text-transform: uppercase;
+}
+
+.rank-points {
+    color: var(--yellow);
+    font-weight: 950;
+    font-size: 13px;
+}
+
+.match-type-badge {
+    display: inline-block;
+    margin-bottom: 22px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-weight: 950;
+    text-transform: uppercase;
+}
+
+.match-type-badge.ranked {
+    background: var(--yellow);
+    color: var(--black);
+}
+
+.match-type-badge.private {
+    background: rgba(255,255,255,0.12);
+    color: var(--white);
+}
+
 .account-player-box strong {
     color: var(--yellow);
 }

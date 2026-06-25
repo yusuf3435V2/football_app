@@ -534,19 +534,21 @@ class GameRoom:
         self.is_sudden_death = False
         self.sudden_death_answers = {}
         self.sudden_death_started_at = None
+        self.is_ranked = False
 
-    def add_player(self, player_id, player_name):
+    def add_player(self, sid, name, user_id=None, is_guest=True):
         """Add a player if the room is not full and the game has not started."""
         if len(self.players) >= 2 or self.game_started:
             return False
 
-        self.players[player_id] = {
-            'id': player_id,
-            'name': player_name,
+        self.players[sid] = {
+            'name': name,
             'score': 0,
+            'is_ready': False,
             'current_answer': None,
             'answers': [],
-            'is_ready': False,
+            'user_id': user_id,
+            'is_guest': is_guest,
         }
         return True
 
@@ -695,6 +697,28 @@ def index():
     return render_template('index.html')
 
 
+def get_rank_from_points(points):
+    if points >= 135:
+        return {"name": "Icon", "color": "#FFD700"}
+    elif points >= 120:
+        return {"name": "Ballon d'Or", "color": "#FACC15"}
+    elif points >= 105:
+        return {"name": "National Hero", "color": "#22C55E"}
+    elif points >= 90:
+        return {"name": "World Class", "color": "#3B82F6"}
+    elif points >= 75:
+        return {"name": "Club Legend", "color": "#8B5CF6"}
+    elif points >= 60:
+        return {"name": "Star Player", "color": "#EF4444"}
+    elif points >= 45:
+        return {"name": "Steady Eddy", "color": "#F97316"}
+    elif points >= 30:
+        return {"name": "Wonderkid", "color": "#06B6D4"}
+    elif points >= 15:
+        return {"name": "Academy Player", "color": "#10B981"}
+    else:
+        return {"name": "Sunday League", "color": "#9CA3AF"}
+
 @socketio.on('connect')
 def handle_connect():
     """Handle client connection."""
@@ -739,25 +763,50 @@ def generate_room_code():
 
 @socketio.on('search_match')
 def handle_search_match(data):
-    """Put player in queue or match them with another waiting player."""
     player_name = data.get('player_name', '').strip()
     sid = request.sid
 
     if not player_name:
         emit('error', {'message': 'Please enter your name.'})
         return
+    
+    if 'user_id' not in session and username_exists(player_name):
+        emit('error', {
+            'message': 'That username belongs to a registered account. Please log in or choose another name.'
+        })
+        return
 
-    # If someone is already waiting, match with them.
-    if waiting_queue:
-        opponent = waiting_queue.pop(0)
+    current_user_id = session.get('user_id')
+    opponent = None
+
+    for queued_player in waiting_queue:
+        if current_user_id and queued_player.get('user_id') == current_user_id:
+            continue
+
+        opponent = queued_player
+        break
+
+    if opponent:
+        waiting_queue.remove(opponent)
 
         room_code = generate_room_code()
         room = GameRoom(room_code)
+        room.is_ranked = True
         rooms[room_code] = room
 
-        # Add both players to the room.
-        room.add_player(opponent['sid'], opponent['player_name'])
-        room.add_player(sid, player_name)
+        room.add_player(
+            opponent['sid'],
+            opponent['player_name'],
+            user_id=opponent.get('user_id'),
+            is_guest=opponent.get('is_guest', True)
+        )
+
+        room.add_player(
+            sid,
+            player_name,
+            user_id=session.get('user_id'),
+            is_guest='user_id' not in session
+        )
 
         join_room(room_code, sid=opponent['sid'])
         join_room(room_code, sid=sid)
@@ -775,10 +824,11 @@ def handle_search_match(data):
         }, to=sid)
 
     else:
-        # Nobody waiting, so add this player to queue.
         waiting_queue.append({
             'sid': sid,
             'player_name': player_name,
+            'user_id': session.get('user_id'),
+            'is_guest': 'user_id' not in session,
         })
 
         emit('searching_for_match', {
@@ -795,13 +845,24 @@ def handle_create_room(data):
     if not room_code or not player_name:
         emit('error', {'message': 'Room code and player name required'})
         return
+    
+    if 'user_id' not in session and username_exists(player_name):
+        emit('error', {
+            'message': 'That username belongs to a registered account. Please log in or choose another name.'
+        })
+        return
 
     if room_code in rooms:
         emit('error', {'message': 'Room already exists'})
         return
 
     room = GameRoom(room_code)
-    room.add_player(sid, player_name)
+    room.add_player(
+        request.sid,
+        player_name,
+        user_id=session.get('user_id'),
+        is_guest='user_id' not in session
+    )
     rooms[room_code] = room
     room.host_sid = request.sid
     join_room(room_code)
@@ -837,13 +898,24 @@ def handle_join_room(data):
         emit('error', {'message': 'Room code and player name required'})
         return
 
+    if 'user_id' not in session and username_exists(player_name):
+        emit('error', {
+            'message': 'That username belongs to a registered account. Please log in or choose another name.'
+        })
+        return
+
     if room_code not in rooms:
         emit('error', {'message': 'Room not found'})
         return
 
     room = rooms[room_code]
 
-    if not room.add_player(sid, player_name):
+    if not room.add_player(
+        request.sid,
+        player_name,
+        user_id=session.get('user_id'),
+        is_guest='user_id' not in session
+    ):
         emit('error', {'message': 'Room is full'})
         return
 
@@ -961,6 +1033,7 @@ def emit_sudden_death_result_after_delay(room_code, winner_id):
             'score': winner['score'],
             'won_by_sudden_death': True,
             'sudden_death_times': get_sudden_death_times(room),
+            'is_ranked': room.is_ranked,
         },
     }, to=room_code)
 
@@ -973,6 +1046,7 @@ def end_sudden_death(room_code, winner_id):
 
     room.game_ended = True
     room.is_sudden_death = False
+    apply_sudden_death_ranked_result(room, winner_id)
 
     socketio.start_background_task(
         emit_sudden_death_result_after_delay,
@@ -1003,6 +1077,7 @@ def emit_sudden_death_draw_after_delay(room_code):
             'won_by_sudden_death': False,
             'sudden_death_draw': True,
             'sudden_death_times': get_sudden_death_times(room),
+            'is_ranked': room.is_ranked,
         },
     }, to=room_code)
 
@@ -1247,6 +1322,27 @@ def start_sudden_death_delayed(room_code):
     )
     room.question_timeout.start()
 
+
+def update_ranked_points(user_id, points_change):
+    if not user_id:
+        return
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        UPDATE users
+        SET ranked_points = ranked_points + %s
+        WHERE id = %s
+        """,
+        (points_change, user_id)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
 def start_sudden_death(room_code):
     """Start a sudden death tie-break question."""
     room = rooms.get(room_code)
@@ -1304,6 +1400,75 @@ def evaluate_and_next_question(room_code):
             end_game(room_code)
 
 
+def update_ranked_points(username, points_change):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        UPDATE users
+        SET ranked_points = ranked_points + %s
+        WHERE username = %s
+        """,
+        (points_change, username)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def username_exists(username):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT id
+        FROM users
+        WHERE LOWER(username) = LOWER(%s)
+        """,
+        (username,)
+    )
+
+    user = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return user is not None
+
+
+def apply_normal_ranked_result(room, winner):
+    if not room.is_ranked:
+        return
+
+    if winner['name'] == 'Draw':
+        return
+
+    for player in room.players.values():
+        if player.get('is_guest'):
+            continue
+
+        if player['name'] == winner['name']:
+            update_ranked_points(player.get('user_id'), 3)
+        else:
+            update_ranked_points(player.get('user_id'), -2)
+
+
+def apply_sudden_death_ranked_result(room, winner_id):
+    if not room.is_ranked:
+        return
+
+    for player_id, player in room.players.items():
+        if player.get('is_guest'):
+            continue
+
+        if player_id == winner_id:
+            update_ranked_points(player.get('user_id'), 2)
+        else:
+            update_ranked_points(player.get('user_id'), -1)
+
 def end_game(room_code):
     """End the game and send final results."""
     room = rooms.get(room_code)
@@ -1316,9 +1481,11 @@ def end_game(room_code):
         room.question_timeout = None
 
     winner = room.get_winner()
+    apply_normal_ranked_result(room, winner)
     socketio.emit('game_ended', {
         'final_scores': winner['scores'],
         'winner': {'name': winner['name'], 'score': winner['score']},
+        'is_ranked': room.is_ranked,
     }, to=room_code)
 
 
@@ -1378,6 +1545,8 @@ def register():
 
         session['user_id'] = user[0]
         session['username'] = user[2]
+        points = 0
+        rank = get_rank_from_points(points)
 
         return jsonify({
             'success': True,
@@ -1385,8 +1554,10 @@ def register():
             'user': {
                 'id': user[0],
                 'email': user[1],
-                'username': user[2]
-            }
+                'username': user[2],
+                'ranked_points': points,
+                'rank': rank
+            }   
         })
 
     except Exception as e:
@@ -1416,7 +1587,7 @@ def login():
 
     cur.execute(
         """
-        SELECT id, email, username, password_hash
+        SELECT id, email, username, password_hash, ranked_points
         FROM users
         WHERE email = %s
         """,
@@ -1442,13 +1613,17 @@ def login():
 
     session['user_id'] = user[0]
     session['username'] = user[2]
+    points = user[4] or 0
+    rank = get_rank_from_points(points)
 
     return jsonify({
         'success': True,
         'user': {
             'id': user[0],
             'email': user[1],
-            'username': user[2]
+            'username': user[2],
+            'ranked_points': points,
+            'rank': rank
         }
     })
 
@@ -1461,11 +1636,40 @@ def get_current_user():
             'user': None
         })
 
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT id, username, ranked_points
+        FROM users
+        WHERE id = %s
+        """,
+        (session['user_id'],)
+    )
+
+    user = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not user:
+        session.clear()
+        return jsonify({
+            'logged_in': False,
+            'user': None
+        })
+
+    points = user[2] or 0
+    rank = get_rank_from_points(points)
+
     return jsonify({
         'logged_in': True,
         'user': {
-            'id': session['user_id'],
-            'username': session['username']
+            'id': user[0],
+            'username': user[1],
+            'ranked_points': points,
+            'rank': rank
         }
     })
 

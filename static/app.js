@@ -38,6 +38,7 @@ const state = {
     authUser: null,
     authMode: 'login',
     showAuthModal: false,
+    isRankedGame: false,
 };
 
 async function checkAuthStatus() {
@@ -135,7 +136,7 @@ socket.on('question_answered', (data) => {
     render();
 });
 
-socket.on('game_ended', (data) => {
+socket.on('game_ended', async (data) => {
     if (timerInterval) clearInterval(timerInterval);
 
     state.gameState = 'results';
@@ -143,6 +144,9 @@ socket.on('game_ended', (data) => {
     state.winner = data.winner;
     state.rematchPlayers = [];
     state.rematchRequested = false;
+    state.isRankedGame = data.is_ranked || false;
+
+    await checkAuthStatus();
 
     render();
 });
@@ -651,7 +655,7 @@ function renderWaiting() {
     return `
         <div class="app">
             <div class="waiting-container">
-                <h1><span class="brand-mini">M</span> MATCH ROOM: ${state.roomCode}</h1>
+                <h1><span class="brand-mini"></span> MATCH ROOM: ${state.roomCode}</h1>
 
                 <p class="info">
                     ${bothPlayersJoined
@@ -890,7 +894,21 @@ function renderAuthBar() {
     if (state.authUser) {
         return `
             <div class="auth-bar">
-                <span class="auth-user">👤 ${state.authUser.username}</span>
+                <div class="auth-profile">
+                    <span class="auth-user">👤 ${state.authUser.username}</span>
+
+                    <span
+                        class="rank-badge"
+                        style="background: ${state.authUser.rank?.color || '#9CA3AF'};"
+                    >
+                        ${state.authUser.rank?.name || 'Sunday League'}
+                    </span>
+
+                    <span class="rank-points">
+                        ${state.authUser.ranked_points ?? 0} RP
+                    </span>
+                </div>
+
                 <button class="auth-btn" onclick="handleLogout()">Logout</button>
             </div>
         `;
@@ -909,7 +927,10 @@ function renderResults() {
         <div class="app">
             ${renderAuthBar()}
             <div class="results-container">
-                <h1><span class="brand-mini">M</span> FULL TIME</h1>
+                <h1><span class="brand-mini"></span> FULL TIME</h1>
+                <div class="match-type-badge ${state.isRankedGame ? 'ranked' : 'private'}">
+                    ${state.isRankedGame ? 'Ranked Match' : 'Private Match'}
+                </div>
 
                 <div class="winner-section">
                     ${state.winner.sudden_death_times ? `
