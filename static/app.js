@@ -490,6 +490,10 @@ async function handleLogin(e) {
         }
 
         state.authUser = data.user;
+
+        socket.disconnect();
+        socket.connect();
+
         state.playerName = data.user.username;
         state.showAuthModal = false;
 

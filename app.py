@@ -767,6 +767,9 @@ def handle_search_match(data):
     player_name = data.get('player_name', '').strip()
     sid = request.sid
 
+    print("SESSION:", dict(session))
+    print("PLAYER:", player_name)
+
     if not player_name:
         emit('error', {'message': 'Please enter your name.'})
         return
