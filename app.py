@@ -1403,25 +1403,6 @@ def evaluate_and_next_question(room_code):
         else:
             end_game(room_code)
 
-
-def update_ranked_points(username, points_change):
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    cur.execute(
-        """
-        UPDATE users
-        SET ranked_points = ranked_points + %s
-        WHERE username = %s
-        """,
-        (points_change, username)
-    )
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
 def username_exists(username):
     conn = get_db_connection()
     cur = conn.cursor()
