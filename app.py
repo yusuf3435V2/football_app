@@ -1337,7 +1337,7 @@ def update_ranked_points(user_id, points_change):
     cur.execute(
         """
         UPDATE users
-        SET ranked_points = ranked_points + %s
+        SET ranked_points = GREATEST(0, ranked_points + %s)
         WHERE id = %s
         """,
         (points_change, user_id)
