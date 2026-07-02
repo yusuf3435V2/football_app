@@ -1150,6 +1150,23 @@ body::after {
     padding: 40px 28px 28px;
 }
 
+.profile-logout-btn {
+    margin-top: 24px;
+    background: #111;
+    border: 1px solid rgba(255,255,255,.12);
+}
+
+.profile-logout-btn:hover {
+    background: #222;
+}
+
+.profile-divider {
+    border: none;
+    height: 1px;
+    background: rgba(255,255,255,.12);
+    margin: 22px 0;
+}
+
 @keyframes lockedOverlay {
     from { opacity: 0; }
     to { opacity: 1; }

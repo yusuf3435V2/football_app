@@ -684,6 +684,14 @@ function renderProfileCard() {
             </div>
 
             <p class="profile-small">More stats coming soon</p>
+
+            <hr class="profile-divider">
+            <button
+                class="btn btn-secondary profile-logout-btn"
+                onclick="handleLogout()"
+            >
+                Log Out
+            </button>
         </div>
     `;
 }
