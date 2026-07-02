@@ -614,90 +614,83 @@ function renderMenu() {
                                 />
                             `}
 
-                            <button
-                                type="submit"
-                                class="btn btn-primary"
-                                ${state.isSearching ? 'disabled' : ''}
-                            >
-                                ${state.isSearching ? 'Searching...' : 'Search for Match'}
+                            <button type="submit" class="btn btn-primary">
+                                Search for Match
                             </button>
                         </form>
                     </div>
 
-                    <div class="private-match-panel">
-                        <div class="private-match-title">Private Match</div>
-
-                        <div class="menu-options">
-                            <div class="menu-section">
-                                <h2>Create</h2>
-                                <form onsubmit="handleCreateRoom(event)">
-                                    <input type="text" id="roomCode" placeholder="Room code" maxlength="20" required />
-                                    ${state.authUser ? `
-                                        <div class="account-player-box">
-                                            Playing as <strong>${state.authUser.username}</strong>
-                                        </div>
-                                    ` : `
-                                        <input type="text" id="playerName" placeholder="Your name" maxlength="20" required />
-                                    `}
-                                    <button type="submit" class="btn btn-secondary">Create</button>
-                                </form>
-                            </div>
-
-                            <div class="menu-section">
-                                <h2>Join</h2>
-                                <form onsubmit="handleJoinRoom(event)">
-                                    <input type="text" id="joinRoomCode" placeholder="Room code" maxlength="20" required />
-                                    ${state.authUser ? `
-                                        <div class="account-player-box">
-                                            Playing as <strong>${state.authUser.username}</strong>
-                                        </div>
-                                    ` : `
-                                        <input type="text" id="joinPlayerName" placeholder="Your name" maxlength="20" required />
-                                    `}
-                                    <button type="submit" class="btn btn-secondary">Join</button>
-                                </form>
-                            </div>
-                        </div>
+                    <div class="centre-brand-card">
+                        <img src="/static/matchup-logo.png" class="main-logo" alt="MatchUp logo">
+                        <h1 class="menu-title">MATCH<span>UP</span></h1>
+                        <p class="brand-tagline">Football knowledge. Head to head.</p>
                     </div>
+
+                    ${renderProfileCard()}
                 </div>
 
-                <div class="private-match-title">
-                    Private Match
-                </div>
-
-                <div class="menu-options">
+                <div class="private-row">
                     <div class="menu-section">
-                        <h2>Create Room</h2>
+                        <h2>Create Private Room</h2>
                         <form onsubmit="handleCreateRoom(event)">
-                            <input type="text" id="roomCode" placeholder="Enter room code" maxlength="20" required />
+                            <input type="text" id="roomCode" placeholder="Room code" maxlength="20" required />
                             ${state.authUser ? `
-                                <div class="account-player-box">
-                                    Playing as <strong>${state.authUser.username}</strong>
-                                </div>
+                                <div class="account-player-box">Playing as <strong>${state.authUser.username}</strong></div>
                             ` : `
-                                <input type="text" id="playerName" placeholder="Enter your name" maxlength="20" required />
+                                <input type="text" id="playerName" placeholder="Your name" maxlength="20" required />
                             `}
-                            <button type="submit" class="btn btn-secondary">Create Private Room</button>
+                            <button type="submit" class="btn btn-secondary">Create</button>
                         </form>
                     </div>
 
                     <div class="menu-section">
-                        <h2>Join Room</h2>
+                        <h2>Join Private Room</h2>
                         <form onsubmit="handleJoinRoom(event)">
-                            <input type="text" id="joinRoomCode" placeholder="Enter room code" maxlength="20" required />
+                            <input type="text" id="joinRoomCode" placeholder="Room code" maxlength="20" required />
                             ${state.authUser ? `
-                                <div class="account-player-box">
-                                    Playing as <strong>${state.authUser.username}</strong>
-                                </div>
+                                <div class="account-player-box">Playing as <strong>${state.authUser.username}</strong></div>
                             ` : `
-                                <input type="text" id="joinPlayerName" placeholder="Enter your name" maxlength="20" required />
+                                <input type="text" id="joinPlayerName" placeholder="Your name" maxlength="20" required />
                             `}
-                            <button type="submit" class="btn btn-secondary">Join Private Room</button>
+                            <button type="submit" class="btn btn-secondary">Join</button>
                         </form>
                     </div>
                 </div>
             </div>
             ${state.showAuthModal ? renderAuthModal() : ''}
+        </div>
+    `;
+}
+
+function renderProfileCard() {
+    if (!state.authUser) {
+        return `
+            <div class="profile-card">
+                <h2>Player Profile</h2>
+                <p class="info">Login to track your rank, points and match history.</p>
+                <button class="btn btn-primary" onclick="openAuthModal('login')">Login</button>
+                <button class="btn btn-secondary" onclick="openAuthModal('register')">Sign Up</button>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="profile-card">
+            <h2>Player Profile</h2>
+            <div class="profile-name">👤 ${state.authUser.username}</div>
+
+            <div
+                class="profile-rank"
+                style="background: ${state.authUser.rank?.color || '#9CA3AF'};"
+            >
+                ${state.authUser.rank?.name || 'Sunday League'}
+            </div>
+
+            <div class="profile-points">
+                ${state.authUser.ranked_points ?? 0} RP
+            </div>
+
+            <p class="profile-small">More stats coming soon</p>
         </div>
     `;
 }
