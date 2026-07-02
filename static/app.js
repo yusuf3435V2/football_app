@@ -585,7 +585,6 @@ function render() {
 function renderMenu() {
     return `
         <div class="app">
-            ${renderAuthBar()}
             <div class="menu-container">
                 <div class="home-grid">
                     <div class="quick-match-card">

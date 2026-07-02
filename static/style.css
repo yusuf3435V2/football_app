@@ -1147,7 +1147,7 @@ body::after {
 }
 
 .menu-container {
-    padding: 28px;
+    padding: 40px 28px 28px;
 }
 
 @keyframes lockedOverlay {
