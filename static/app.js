@@ -587,12 +587,6 @@ function renderMenu() {
         <div class="app">
             ${renderAuthBar()}
             <div class="menu-container">
-                <div class="brand-lockup">
-                    <img src="/static/matchup-logo.png" class="main-logo" alt="MatchUp logo">
-                    <h1 class="menu-title">MATCH<span>UP</span></h1>
-                    <p class="brand-tagline">Football knowledge. Head to head.</p>
-                </div>
-
                 <div class="home-grid">
                     <div class="quick-match-card">
                         <h2>Quick Match</h2>
