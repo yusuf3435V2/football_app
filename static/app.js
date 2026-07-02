@@ -593,35 +593,72 @@ function renderMenu() {
                     <p class="brand-tagline">Football knowledge. Head to head.</p>
                 </div>
 
-                <div class="quick-match-card">
-                    <h2>Quick Match</h2>
-                    <p class="info">Search online and play against another player instantly.</p>
+                <div class="home-grid">
+                    <div class="quick-match-card">
+                        <h2>Quick Match</h2>
+                        <p class="info">Search online and play against another player instantly.</p>
 
-                    <form onsubmit="handleSearchMatch(event)">
-                        ${state.authUser ? `
-                            <div class="account-player-box">
-                                Playing as <strong>${state.authUser.username}</strong>
-                            </div>
-                        ` : `
-                            <input
-                                type="text"
-                                id="searchPlayerName"
-                                placeholder="Enter your name"
-                                maxlength="20"
-                                required
+                        <form onsubmit="handleSearchMatch(event)">
+                            ${state.authUser ? `
+                                <div class="account-player-box">
+                                    Playing as <strong>${state.authUser.username}</strong>
+                                </div>
+                            ` : `
+                                <input
+                                    type="text"
+                                    id="searchPlayerName"
+                                    placeholder="Enter your name"
+                                    maxlength="20"
+                                    required
+                                    ${state.isSearching ? 'disabled' : ''}
+                                />
+                            `}
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
                                 ${state.isSearching ? 'disabled' : ''}
-                            />
-                        `}
+                            >
+                                ${state.isSearching ? 'Searching...' : 'Search for Match'}
+                            </button>
+                        </form>
+                    </div>
 
-                        <button
-                            type="submit"
-                            class="btn btn-primary"
-                            ${state.isSearching ? 'disabled' : ''}
-                        >
-                            ${state.isSearching ? 'Searching...' : 'Search for Match'}
-                        </button>
-                    </form>
+                    <div class="private-match-panel">
+                        <div class="private-match-title">Private Match</div>
 
+                        <div class="menu-options">
+                            <div class="menu-section">
+                                <h2>Create</h2>
+                                <form onsubmit="handleCreateRoom(event)">
+                                    <input type="text" id="roomCode" placeholder="Room code" maxlength="20" required />
+                                    ${state.authUser ? `
+                                        <div class="account-player-box">
+                                            Playing as <strong>${state.authUser.username}</strong>
+                                        </div>
+                                    ` : `
+                                        <input type="text" id="playerName" placeholder="Your name" maxlength="20" required />
+                                    `}
+                                    <button type="submit" class="btn btn-secondary">Create</button>
+                                </form>
+                            </div>
+
+                            <div class="menu-section">
+                                <h2>Join</h2>
+                                <form onsubmit="handleJoinRoom(event)">
+                                    <input type="text" id="joinRoomCode" placeholder="Room code" maxlength="20" required />
+                                    ${state.authUser ? `
+                                        <div class="account-player-box">
+                                            Playing as <strong>${state.authUser.username}</strong>
+                                        </div>
+                                    ` : `
+                                        <input type="text" id="joinPlayerName" placeholder="Your name" maxlength="20" required />
+                                    `}
+                                    <button type="submit" class="btn btn-secondary">Join</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="private-match-title">

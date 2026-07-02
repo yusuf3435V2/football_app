@@ -176,7 +176,7 @@ body::after {
     background:
         linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,244,245,0.95));
     border-radius: var(--radius-lg);
-    padding: 48px;
+    padding: 28px;
     box-shadow: var(--shadow-dark);
     border: 1px solid rgba(255,255,255,0.7);
     position: relative;
@@ -204,8 +204,8 @@ body::after {
 
 .menu-options {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
 }
 
 .menu-section {
@@ -410,14 +410,14 @@ body::after {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: 38px;
+    margin-bottom: 20px;
     text-align: center;
 }
 
 .menu-title {
     margin-top: 14px;
     color: var(--white);
-    font-size: 58px;
+    font-size: 42px;
     font-weight: 950;
     letter-spacing: 2px;
     font-style: italic;
@@ -475,7 +475,7 @@ body::after {
 
 
 .main-logo {
-    width: 240px;
+    width: 110px;
     max-width: 100%;
     height: auto;
     display: block;
@@ -1034,6 +1034,41 @@ body::after {
     color: var(--yellow);
 }
 
+.home-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 22px;
+    align-items: stretch;
+}
+
+.quick-match-card,
+.private-match-panel {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 22px;
+    padding: 26px;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+}
+
+.private-match-title {
+    margin-bottom: 16px;
+    color: var(--yellow);
+    font-size: 22px;
+    font-weight: 950;
+    text-transform: uppercase;
+}
+
+.menu-section {
+    padding: 22px;
+}
+
+.menu-section h2,
+.quick-match-card h2 {
+    color: var(--white);
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
 @keyframes lockedOverlay {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -1117,5 +1152,20 @@ body::after {
 
     .winner-text {
         font-size: 26px;
+    }
+}
+
+@media (max-width: 850px) {
+    .home-grid,
+    .menu-options {
+        grid-template-columns: 1fr;
+    }
+
+    .main-logo {
+        width: 100px;
+    }
+
+    .menu-title {
+        font-size: 36px;
     }
 }
