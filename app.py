@@ -766,6 +766,8 @@ def generate_room_code():
 def handle_search_match(data):
     player_name = data.get('player_name', '').strip()
     sid = request.sid
+    device_id = data.get('device_id')
+    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
 
     print("SESSION:", dict(session))
     print("PLAYER:", player_name)
@@ -784,8 +786,17 @@ def handle_search_match(data):
     opponent = None
 
     for queued_player in waiting_queue:
+        # Stop same account matching itself
         if current_user_id and queued_player.get('user_id') == current_user_id:
             continue
+
+        # Stop same browser/device matching itself
+        if device_id and queued_player.get('device_id') == device_id:
+            continue
+
+        # # Stop same IP matching itself for ranked quick match
+        # if ip_address and queued_player.get('ip_address') == ip_address:
+        #     continue
 
         opponent = queued_player
         break
@@ -833,6 +844,8 @@ def handle_search_match(data):
             'player_name': player_name,
             'user_id': session.get('user_id'),
             'is_guest': 'user_id' not in session,
+            'device_id': device_id,
+            'ip_address': ip_address,
         })
 
         emit('searching_for_match', {

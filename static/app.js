@@ -1,6 +1,17 @@
 // Initialize socket connection
 const socket = io();
 
+function getDeviceId() {
+    let deviceId = localStorage.getItem('matchup_device_id');
+
+    if (!deviceId) {
+        deviceId = crypto.randomUUID();
+        localStorage.setItem('matchup_device_id', deviceId);
+    }
+
+    return deviceId;
+}
+
 const sounds = {
     click: new Audio('/static/sounds/click.mp3'),
     tick: new Audio('/static/sounds/tick.mp3'),
@@ -413,7 +424,8 @@ function handleSearchMatch(e) {
     state.gameState = 'searching';
 
     socket.emit('search_match', {
-        player_name: playerName
+        player_name: playerName,
+        device_id: getDeviceId()
     });
 
     render();
