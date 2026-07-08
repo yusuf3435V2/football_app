@@ -1274,3 +1274,9 @@ body::after {
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 600px) {
+    .auth-bar {
+        display: none;
+    }
+}

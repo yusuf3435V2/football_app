@@ -9,7 +9,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify, session
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'quiz-secret-key-2026'
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 socketio = SocketIO(
     app,
