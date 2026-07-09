@@ -516,6 +516,18 @@ async function handleLogin(e) {
     }
 }
 
+function handleLeaveRoom() {
+    socket.emit('leave_room');
+
+    state.gameState = 'menu';
+    state.roomCode = '';
+    state.players = [];
+    state.isPlayerReady = false;
+    state.isHost = false;
+
+    render();
+}
+
 async function handleLogout() {
     try {
         await fetch('/api/logout', {
@@ -740,6 +752,9 @@ function renderWaiting() {
                     </button>
                 ` : ''}
                 ` : `
+                <button class="btn btn-danger" onclick="handleLeaveRoom()">
+                    Leave Room
+                </button>
                     <div class="spinner"></div>
                     <p class="info">Share this room code: <strong style="font-size: 18px; color: #ff6b35;">${state.roomCode}</strong></p>
                 `}

@@ -1671,6 +1671,23 @@ def get_current_user():
     })
 
 
+@socketio.on('leave_room')
+def handle_leave_room():
+    sid = request.sid
+
+    for room_code, room in list(rooms.items()):
+        if sid in room.players:
+            del room.players[sid]
+
+            emit('player_left', {
+                'players': room.get_player_statuses()
+            }, to=room_code)
+
+            if len(room.players) == 0:
+                del rooms[room_code]
+
+            return
+
 @app.route('/api/logout', methods=['POST'])
 def logout():
     session.clear()
