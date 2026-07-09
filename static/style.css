@@ -1251,6 +1251,8 @@ body::after {
     .winner-text {
         font-size: 26px;
     }
+
+    
 }
 
 @media (max-width: 850px) {
@@ -1281,4 +1283,18 @@ body::after {
         display: none !important;
     }
 
+}
+
+@media (max-width: 950px) {
+    .centre-brand-card {
+        order: 1;
+    }
+
+    .quick-match-card {
+        order: 2;
+    }
+
+    .profile-card {
+        order: 3;
+    }
 }
