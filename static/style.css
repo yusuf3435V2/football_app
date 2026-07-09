@@ -1275,23 +1275,10 @@ body::after {
     }
 }
 
-@media (max-width: 600px) {
-    .auth-bar {
-        display: none;
-    }
-}
+@media (max-width: 1024px) {
 
-@media (max-width: 700px) {
     .auth-bar {
         display: none !important;
     }
+
 }
-
-@media (max-width: 700px) {
-    .auth-bar {
-        display: none !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-    }
-} 
-
