@@ -1,6 +1,9 @@
 // Initialize socket connection
 const socket = io();
 
+// Question time length
+const QUESTION_TIME = 7;
+
 function getDeviceId() {
     let deviceId = localStorage.getItem('matchup_device_id');
 
@@ -126,7 +129,7 @@ socket.on('game_started', (data) => {
     state.totalQuestions = data.total_questions;
     state.scores = data.scores || {};
     state.gameState = 'quiz';
-    state.timeLeft = 5;
+    state.timeLeft = QUESTION_TIME;
     state.answered = false;
     state.answerResult = null;
     state.screenFlash = '';
@@ -139,7 +142,7 @@ socket.on('question_answered', (data) => {
     state.questionNumber = data.question_number;
     state.totalQuestions = data.total_questions;
     state.scores = data.scores;
-    state.timeLeft = 5;
+    state.timeLeft = QUESTION_TIME;
     state.answered = false;
     state.answerResult = null;
     state.screenFlash = '';
@@ -229,7 +232,7 @@ socket.on('rematch_ready', (data) => {
     state.players = data.players;
     state.currentQuestion = null;
     state.questionNumber = 0;
-    state.timeLeft = 5;
+    state.timeLeft = QUESTION_TIME;
     state.answered = false;
     state.answerResult = null;
     state.screenFlash = '';
@@ -260,7 +263,7 @@ socket.on('sudden_death_question', (data) => {
     state.gameState = 'suddenDeath';
     state.currentQuestion = data.question;
     state.scores = data.scores || {};
-    state.timeLeft = 5;
+    state.timeLeft = QUESTION_TIME;
     state.answered = false;
     state.answerResult = null;
     state.screenFlash = '';
@@ -293,7 +296,7 @@ let timerInterval = null;
 function startTimer() {
     if (timerInterval) clearInterval(timerInterval);
 
-    state.timeLeft = 5;
+    state.timeLeft = QUESTION_TIME;
 
     timerInterval = setInterval(() => {
         state.timeLeft -= 1;
@@ -378,7 +381,7 @@ function handlePlayAgain() {
     state.players = [];
     state.currentQuestion = null;
     state.questionNumber = 0;
-    state.timeLeft = 5;
+    state.timeLeft = QUESTION_TIME;
     state.answered = false;
     state.scores = {};
     state.finalScores = {};
