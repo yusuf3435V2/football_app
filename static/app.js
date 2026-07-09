@@ -743,20 +743,23 @@ function renderWaiting() {
                     >
                         ${state.isPlayerReady ? 'READY' : 'Ready Up'}
                     </button>
-                ${state.isHost ? `
+
                     <button
                         class="btn btn-danger"
-                        onclick="handleCloseRoom()"
+                        onclick="handleLeaveRoom()"
                     >
-                        ❌ Close Room
+                        Leave Room
                     </button>
-                ` : ''}
                 ` : `
-                <button class="btn btn-danger" onclick="handleLeaveRoom()">
-                    Leave Room
-                </button>
                     <div class="spinner"></div>
                     <p class="info">Share this room code: <strong style="font-size: 18px; color: #ff6b35;">${state.roomCode}</strong></p>
+
+                    <button
+                        class="btn btn-danger"
+                        onclick="handleLeaveRoom()"
+                    >
+                        Leave Room
+                    </button>
                 `}
             </div>
         </div>
