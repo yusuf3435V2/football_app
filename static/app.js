@@ -36,7 +36,7 @@ const state = {
     currentQuestion: null,
     questionNumber: 0,
     totalQuestions: 10,
-    timeLeft: 5,
+    timeLeft: QUESTION_TIME,
     answered: false,
     screenFlash: '',
     scores: {},

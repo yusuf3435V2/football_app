@@ -24,6 +24,7 @@ waiting_queue = []
 
 # Answers stay on the backend only. The frontend only receives id/question/options.
 GAME_QUESTION_COUNT = 10
+QUESTION_TIME = 7
 
 QUESTIONS = [
     {'id': 1, 'question': 'Which player has won the most Ballon d\'Or awards?', 'options': ['Cristiano Ronaldo', 'Lionel Messi', 'Zinedine Zidane', 'Ronaldo Nazario'], 'correct': 1},
@@ -1148,7 +1149,7 @@ def schedule_question_timeout(room_code):
     if room.question_timeout:
         room.question_timeout.cancel()
 
-    room.question_timeout = threading.Timer(5.0, evaluate_and_next_question, args=[room_code])
+    room.question_timeout = threading.Timer(QUESTION_TIME, evaluate_and_next_question, args=[room_code])
     room.question_timeout.start()
 
 
